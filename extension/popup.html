@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>LinkedIn Comment Streak</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div>
+      <div class="eyebrow">LinkedIn comments today</div>
+      <div class="today"><span id="todayCount">0</span><span class="of"> / <span id="goalLabel">5</span></span></div>
+    </div>
+    <div class="progress" aria-hidden="true"><div id="progressFill"></div></div>
+  </header>
+
+  <section class="stats">
+    <div class="tile"><div class="label">Current streak</div><div class="value" id="current">0</div></div>
+    <div class="tile"><div class="label">Longest streak</div><div class="value" id="longest">0</div></div>
+    <div class="tile"><div class="label">Goal hit, last 30 days</div><div class="value" id="goal30">0/30</div></div>
+  </section>
+
+  <section class="heatmap">
+    <div class="months" id="months"></div>
+    <div class="grid-wrap">
+      <div class="weekdays"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="caption">
+      <span id="yearTotal">0 comments in the last year</span>
+      <span class="legend">
+        <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i>
+        <span class="legend-text">none → under half → under goal → goal → 2× goal</span>
+      </span>
+    </div>
+  </section>
+
+  <footer>
+    <span class="left">
+      <label>Daily goal <input id="goal" type="number" min="1" max="100" /></label>
+      <label class="sound"><input id="sound" type="checkbox" /> Chime</label>
+      <button id="testChime" class="text" title="Hear the chime">Play</button>
+    </span>
+    <span class="fix">Fix today's count
+      <button id="minus" title="Remove one">−</button>
+      <button id="plus" title="Add one">+</button>
+    </span>
+  </footer>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

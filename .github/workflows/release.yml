@@ -1,0 +1,27 @@
+name: Release
+
+# Push a tag like v1.3.0 to build the store zip and attach it to a GitHub release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tag must match manifest version
+        run: |
+          V=$(node -p "JSON.parse(require('fs').readFileSync('extension/manifest.json','utf8')).version")
+          [ "v$V" = "$GITHUB_REF_NAME" ] || { echo "Tag $GITHUB_REF_NAME does not match manifest version $V"; exit 1; }
+      - run: npm run package
+      - run: gh release create "$GITHUB_REF_NAME" dist/*.zip --title "$GITHUB_REF_NAME" --notes-file <(node scripts/release-notes.mjs "$GITHUB_REF_NAME")
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}

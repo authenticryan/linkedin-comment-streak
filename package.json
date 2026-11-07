@@ -1,0 +1,14 @@
+{
+  "name": "linkedin-comment-streak",
+  "private": true,
+  "type": "module",
+  "description": "Chrome extension: counts your LinkedIn comments and shows a GitHub-style heatmap.",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "check": "node scripts/validate.mjs && for f in extension/*.js; do node --check \"$f\" || exit 1; done",
+    "package": "npm run check && npm test && sh scripts/package.sh"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
