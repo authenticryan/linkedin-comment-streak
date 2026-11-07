@@ -8,7 +8,7 @@
 
 LinkedIn's trademark rules and the Store's impersonation policy make "LinkedIn" at the start of a product name a rejection risk. It reads as if LinkedIn made it.
 
-**Recommendation:** list it as **"Comment Streak"** (or "Comment Streak for LinkedIn") and say "works on LinkedIn" in the description. Never use the LinkedIn logo or blue "in" mark. The current icon is fine. The GitHub repo name doesn't need to change.
+**Decided (v1.2.1):** the extension is named **"Comment Streak for LinkedIn"**. Never use the LinkedIn logo or blue "in" mark. The current icon is fine. The GitHub repo name stays `linkedin-comment-streak`.
 
 ### 2. Visibility
 
@@ -43,7 +43,7 @@ Updates later: bump the version, upload the new zip, submit. Users get it automa
 > Count your LinkedIn comments, keep a daily streak, and see your consistency as a GitHub-style heatmap.
 
 **Description**
-> Building a presence on LinkedIn comes down to showing up every day. Comment Streak counts the comments you post on LinkedIn (desktop) and turns them into a year-long heatmap, so you can see at a glance how consistent you are.
+> Building a presence on LinkedIn comes down to showing up every day. Comment Streak for LinkedIn counts the comments you post on LinkedIn (desktop) and turns them into a year-long heatmap, so you can see at a glance how consistent you are.
 >
 > • Toolbar badge with today's count, green when you hit your goal
 > • Heatmap shaded by your daily goal, plus current and longest streaks

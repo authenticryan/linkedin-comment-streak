@@ -2,7 +2,7 @@
 
 _Last updated: 7 November 2026_
 
-LinkedIn Comment Streak counts how many comments you post on LinkedIn each day and shows the totals to you.
+Comment Streak for LinkedIn counts how many comments you post on LinkedIn each day and shows the totals to you.
 
 **What it reads.** On linkedin.com, it checks the web address, method and status of LinkedIn's own network requests to tell when a comment has been posted. It never reads the text of your comments, your messages, your profile or anyone else's data.
 

@@ -21,7 +21,7 @@ POST /flagship-web/rsc-action/actions/server-request?sduiid=com.linkedin.sdui.co
 
 ### No ding or count after commenting
 
-1. `chrome://extensions` → LinkedIn Comment Streak → click **service worker** to open its console
+1. `chrome://extensions` → Comment Streak for LinkedIn → click **service worker** to open its console
 2. Post a comment
 3. Look at the `[LCS] POST ...` lines. One of them is the new "post a comment" request.
 4. Update `isCommentCreate` in `extension/lib.js`, add that request name to `tests/lib.test.mjs`, run `npm test`

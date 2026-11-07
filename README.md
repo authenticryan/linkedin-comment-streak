@@ -1,4 +1,4 @@
-# LinkedIn Comment Streak
+# Comment Streak for LinkedIn
 
 A Chrome extension that counts the LinkedIn comments you post on desktop and shows them as a GitHub-style heatmap, so you can see how consistent you are with your daily commenting goal.
 
@@ -13,7 +13,7 @@ A Chrome extension that counts the LinkedIn comments you post on desktop and sho
 1. Download or clone this repo
 2. Open `chrome://extensions` and turn on **Developer mode** (top right)
 3. Click **Load unpacked** and select the `extension` folder
-4. Pin it: puzzle-piece icon → pin **LinkedIn Comment Streak**
+4. Pin it: puzzle-piece icon → pin **Comment Streak for LinkedIn**
 
 After pulling an update, click ↻ on the extension in `chrome://extensions` and refresh your LinkedIn tabs.
 

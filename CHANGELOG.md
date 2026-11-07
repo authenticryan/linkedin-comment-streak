@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.1 — 2026-11-07
+
+- Renamed to "Comment Streak for LinkedIn" for the Chrome Web Store, so the name doesn't look like an official LinkedIn product.
+- Store listing images added in `store/`.
+
 ## 1.2.0 — 2026-11-07
 
 - ⌘+Enter (Ctrl+Enter on Windows) posts the comment or reply you're typing.

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Store screenshot</title>
+<style>
+  :root { --bg1: #f5f8fb; --bg2: #e3edf8; --fg: #1f2328; --muted: #57606a; --dot: #30a14e; --frame: #d0d7de; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg1: #0b0f14; --bg2: #13233a; --fg: #e6edf3; --muted: #9da7b3; --dot: #39d353; --frame: #30363d; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; }
+  body {
+    display: flex; align-items: center; gap: 48px; padding: 0 64px 0 80px;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    color: var(--fg); font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .copy { width: 400px; flex: none; }
+  .eyebrow { font-size: 16px; font-weight: 600; color: var(--dot); letter-spacing: .02em; margin-bottom: 18px; }
+  h1 { font-size: 46px; line-height: 1.08; margin: 0 0 28px; letter-spacing: -0.02em; }
+  ul { list-style: none; padding: 0; margin: 0; font-size: 19px; color: var(--muted); }
+  li { margin: 12px 0; padding-left: 26px; position: relative; }
+  li::before { content: ""; position: absolute; left: 0; top: 7px; width: 12px; height: 12px; border-radius: 3px; background: var(--dot); }
+  .popup {
+    width: 672px; height: 318px; flex: none; overflow: hidden;
+    border-radius: 12px; border: 1px solid var(--frame);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 18%), 0 4px 14px rgb(0 0 0 / 8%);
+  }
+  iframe { width: 790px; height: 425px; border: 0; transform: scale(0.85); transform-origin: 0 0; display: block; }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <div class="eyebrow">Comment Streak for LinkedIn</div>
+    <h1 id="headline">See how consistent you really are.</h1>
+    <ul id="points">
+      <li>Counts every comment you post</li>
+      <li>Heatmap shaded by your daily goal</li>
+      <li>Current and longest streaks</li>
+      <li>Private: nothing leaves your browser</li>
+    </ul>
+  </div>
+  <div class="popup"><iframe src="popup-demo.html" title="Extension popup"></iframe></div>
+  <script>
+    if (new URLSearchParams(location.search).get("v") === "2") {
+      document.getElementById("headline").textContent = "A ding for every comment. Keep the streak alive.";
+      document.getElementById("points").innerHTML =
+        "<li>Soft chime per comment, bigger one at your goal</li><li>Badge shows today's count at a glance</li><li>⌘+Enter posts the comment you're typing</li><li>No account, no server, no tracking</li>";
+    }
+  </script>
+</body>
+</html>
