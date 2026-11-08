@@ -13,16 +13,16 @@
     const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
     const progress = 1 - i / 365; // more consistent in recent months
     if (i <= 23) {
-      counts[key(d)] = 5 + Math.floor(rand(i + 7) * 5); // a 23-day streak
+      counts[key(d)] = 100 + Math.floor(rand(i + 7) * 100); // a 23-day streak at the default goal of 100
     } else if (rand(i) < 0.2 + 0.72 * progress) {
-      counts[key(d)] = 1 + Math.floor(rand(i + 3) * (2 + 7 * progress));
+      counts[key(d)] = 20 * (1 + Math.floor(rand(i + 3) * (2 + 7 * progress))) - Math.floor(rand(i + 11) * 15);
     }
   }
-  counts[key(now)] = 4;
+  counts[key(now)] = 80;
 
   window.chrome = {
     storage: {
-      local: { get: async () => ({ counts, goal: 5, sound: true }), set: async () => {} },
+      local: { get: async () => ({ counts, goal: 100, sound: true }), set: async () => {} },
       onChanged: { addListener() {} },
     },
     runtime: { sendMessage() {} },

@@ -1,6 +1,6 @@
 // Shared logic for the background worker and the popup.
 
-export const DEFAULT_GOAL = 5;
+export const DEFAULT_GOAL = 100;
 
 const pad = (n) => String(n).padStart(2, "0");
 

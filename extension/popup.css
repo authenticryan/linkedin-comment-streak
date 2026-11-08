@@ -134,7 +134,7 @@ input, button {
   border: 1px solid var(--border);
   border-radius: 6px;
 }
-input { width: 56px; margin-left: 6px; padding: 3px 6px; }
+input { width: 64px; margin-left: 6px; padding: 3px 6px; }
 button { width: 26px; height: 24px; margin-left: 4px; cursor: pointer; }
 button:hover { border-color: var(--accent); }
 .left { display: flex; align-items: center; gap: 16px; }

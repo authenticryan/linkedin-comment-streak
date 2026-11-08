@@ -18,7 +18,7 @@ async function render() {
   $("current").textContent = days(s.current);
   $("longest").textContent = days(s.longest);
   $("goal30").textContent = `${s.goalDays30}/30`;
-  $("yearTotal").textContent = `${s.yearTotal} ${s.yearTotal === 1 ? "comment" : "comments"} in the last year`;
+  $("yearTotal").textContent = `${s.yearTotal.toLocaleString()} ${s.yearTotal === 1 ? "comment" : "comments"} in the last year`;
   if (document.activeElement !== $("goal")) $("goal").value = goal;
 
   // 53 week columns, Sunday-first, ending with the current week.
@@ -50,7 +50,7 @@ async function render() {
 
 $("goal").addEventListener("change", (e) => {
   const v = Math.round(Number(e.target.value));
-  if (v >= 1 && v <= 100) chrome.storage.local.set({ goal: v });
+  if (v >= 1 && v <= 1000) chrome.storage.local.set({ goal: v });
   else render();
 });
 $("sound").addEventListener("change", (e) => chrome.storage.local.set({ sound: e.target.checked }));

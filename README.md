@@ -4,128 +4,158 @@
 
 **A GitHub-style streak for your LinkedIn comments.**
 
-Comment Streak is a Chrome extension that counts the comments you post on LinkedIn and turns them into a year-long heatmap. You set a daily goal. Every comment adds a soft ding and bumps the toolbar badge, and the badge turns green when you hit the goal.
+Comment Streak is a Chrome extension. It counts the comments that you post on LinkedIn and shows them on a heatmap for one year. You set a daily goal. The default goal is 100 comments, because the extension is for power users. For each comment, the extension plays a short sound and adds 1 to the toolbar badge. When you reach your goal, the badge changes to green.
 
-![Comment Streak popup: today's count of 4 out of 5, a 23-day current streak, 25 of the last 30 days on goal, and a year-long green heatmap](store/screenshot-1-1280x800.png)
+![Comment Streak popup: 80 of 100 comments today, a current streak of 23 days, the goal on 25 of the last 30 days, and 14,049 comments on a green heatmap for one year](store/screenshot-1-1280x800.png)
 
-**Chrome Web Store:** in review · **Download:** [latest release](https://github.com/authenticryan/linkedin-comment-streak/releases/latest) · **Privacy:** [nothing leaves your browser](PRIVACY.md)
+**Chrome Web Store:** in review · **Download:** [latest release](https://github.com/authenticryan/linkedin-comment-streak/releases/latest) · **Privacy:** [no data goes out of your browser](PRIVACY.md)
 
 ---
 
-## Why I built this
+## Why I made this extension
 
-Every guide to growing on LinkedIn gives the same advice: comment thoughtfully on other people's posts, every day. Comments start conversations with people you'd like to know, and they put your name in front of audiences that don't follow you yet, long before your own posts take off.
+Many guides about LinkedIn give the same advice: write good comments on the posts of other people every day. Comments start conversations with new people. They also show your name to people who do not follow you, before your own posts become popular.
 
-So I set myself a goal of one hundred comments a day, and then realised I couldn't tell whether I was hitting it. LinkedIn shows impressions on your posts, but it gives you no daily count of the comments you write. The habit only works if you keep it up every day, and that was the part I couldn't see.
+I set a goal of 100 comments each day. Then I found that I could not see if I reached this goal. LinkedIn shows the views on your posts. It does not show how many comments you write each day. The habit is effective only if you do it every day, and I could not see that part.
 
-Developers already have a fix for this problem: GitHub's contribution graph. A green square for every day you showed up is a simple reason not to break the chain. So I built the same thing for LinkedIn comments. It counts on its own, so there's nothing to log, and it sits in the toolbar where I see it all day.
+Software developers have a solution for this problem: the GitHub contribution graph. The graph shows a green square for each day that you did work. The green squares give you a reason to continue each day.
 
-## What it does
+I made the same type of graph for LinkedIn comments. At 100 comments each day, you cannot count by hand. For this reason, the extension counts automatically. It stays in the toolbar, where you can see it all day.
 
-- **Automatic counting.** Post a comment or a reply on linkedin.com and it's counted, with nothing to log by hand. Edits, deletes and failed posts don't count.
-- **Toolbar badge.** Today's count is always visible. The badge turns from blue to green when you hit your goal.
-- **Heatmap and streaks.** A year of days, each shaded by how close you came to your goal: light is under half, mid is under goal, dark is goal met and darkest is double. You also get your current streak, your longest streak and how many of the last 30 days hit the goal. Hover a day to see its count.
-- **A ding for every comment.** A soft two-note chime plays for each comment, and a brighter four-note chime plays when you reach your goal. Preview it with **Play** (shift-click for the goal chime) or switch it off.
-- **⌘+Enter to post.** (Ctrl+Enter on Windows) posts the comment you're typing.
-- **Fixable.** If a count is ever wrong, **−** and **+** correct today's number.
-- **Private.** No account, no server, no analytics. It never reads your comment text.
+## What the extension does
 
-![Dark mode: a ding for every comment, the badge shows today's count, ⌘+Enter posts the comment you're typing](store/screenshot-2-1280x800.png)
+- **Automatic count.** When you post a comment or a reply on linkedin.com, the extension counts it. You do not record it yourself. The extension does not count edits, deleted comments, or posts that fail.
+- **Toolbar badge.** The badge shows the number of comments for today. The badge changes from blue to green when you reach your goal.
+- **Daily goal.** The default goal is 100 comments each day. You can set a goal from 1 to 1,000 in the popup.
+- **Heatmap and streaks.** The heatmap shows each day of the last year. The color of a day shows how near you were to your goal:
+  - Light green: less than half of your goal
+  - Medium green: less than your goal
+  - Dark green: your goal
+  - Darkest green: two times your goal, or more
+
+  The extension also shows your current streak and your longest streak. It also shows the number of days in the last 30 days that you reached your goal. Put the pointer on a day to see its count.
+- **A sound for each comment.** The extension plays a short two-note sound for each comment. When you reach your goal, it plays a brighter four-note sound. To hear the sound, click **Play**. To hear the goal sound, hold Shift and click **Play**. You can also set the sound to off.
+- **⌘+Enter to post.** Press ⌘+Enter (Ctrl+Enter on Windows) to post the comment in the comment box.
+- **Manual correction.** If the count for today is not correct, use **−** and **+** to correct it.
+- **Privacy.** The extension has no account, no server, and no analytics. It does not read the text of your comments.
+
+![Dark theme: a sound for each comment, the badge shows the count for today, and ⌘+Enter posts the comment](store/screenshot-2-1280x800.png)
 
 ## Product decisions
 
-In a small product, most of the interesting decisions are about what to leave out, and why.
+In a small product, the most important decisions are about what to remove. This table gives each decision and the reason for it.
 
-| Decision | Reasoning |
+| Decision | Reason |
 |---|---|
-| **Count automatically from LinkedIn's own request** | People abandon trackers they have to update by hand. Watching for LinkedIn's "comment saved" request means counting takes zero effort, and only comments that actually posted are counted. |
-| **Count one exact action and ignore lookalikes** | About 80 ms before every real `createComment`, LinkedIn fires a similar-looking `submitCommentButton` request. Counting both would double every number, and nobody keeps using a tracker they can't trust. |
-| **Shade by your goal, not by raw volume** | GitHub shades a day by how busy it was. Here the colour answers one question: did I show up? Dark green means you met your goal, whether the goal is 2 a day or 10. |
-| **Streaks survive until the day is over** | If the streak dropped to 0 every morning until your first comment, it would feel like a penalty. As on GitHub, it stays alive from yesterday until midnight. |
-| **Show "Goal hit, last 30 days" next to the streak** | One missed day resets a streak to zero, and that's when people quit. Seeing 25/30 tells you you're still consistent, so one bad day doesn't end the habit. |
-| **A chime, and a bigger one at the goal** | Instant feedback helps a habit stick, and the goal chime marks the finish line. The sound is generated in the browser, so there are no audio files, and it can be switched off. |
-| **Let people fix the count** | Counting depends on LinkedIn's website, and that website changes. With − and +, a missed comment takes two seconds to fix and doesn't cost you your streak. |
-| **⌘+Enter presses LinkedIn's own button** | It makes the core action faster without automating it. You still write and send every comment yourself, which keeps the extension clear of LinkedIn's rules against automation. |
-| **Named "Comment Streak for LinkedIn"** | A name that starts with "LinkedIn" reads like an official product, which risks rejection from the Chrome Web Store. "X for LinkedIn" passes review and still matches what people search for. The listing uses no LinkedIn logo. |
-| **No account, no server, narrow permissions** | It runs on a site full of private data, so it reads only the address and status of LinkedIn's own requests, and only on linkedin.com. That earns trust and keeps store review simple. |
-| **Desktop only, and upfront about it** | A Chrome extension can't see the LinkedIn mobile app. The README and the store listing say so, so nobody is surprised by a low count. |
+| **Set the default goal to 100** | This extension is for power users who write many comments each day. A low default goal, such as 5, gives no challenge to these users. If your target is different, you can set a goal from 1 to 1,000. |
+| **Count automatically from the LinkedIn request** | People do not continue to use a tracker if they must record each item. The extension monitors the "comment saved" request from LinkedIn. You do no work, and the extension counts only the comments that LinkedIn saved. |
+| **Count one action only, and ignore similar requests** | Approximately 80 ms before each `createComment` request, LinkedIn sends a similar `submitCommentButton` request. If the extension counted the two requests, each number would be two times too large. People do not continue to use a tracker that shows incorrect numbers. |
+| **Use the goal to set the color, not the quantity** | GitHub sets the color of a day from the quantity of work. In this extension, the color answers one question: did you reach your goal? Dark green shows that you reached it, for a goal of 20 or a goal of 100. |
+| **Keep the streak until the day ends** | If the streak changed to 0 each morning before your first comment, you would see this as a penalty. As on GitHub, the streak from yesterday continues until midnight. |
+| **Show "Goal hit, last 30 days" next to the streak** | If you miss one day, the streak changes to zero. At that time, many people stop. A value such as 25/30 shows that you are still consistent, so one bad day does not stop the habit. |
+| **Play a sound, and a brighter sound at the goal** | Immediate feedback helps people to continue a habit. The goal sound shows that you completed the goal for the day. The browser makes the sound, so the extension has no audio files. You can set the sound to off. |
+| **Let users correct the count** | The count uses the LinkedIn website, and LinkedIn changes its website. With **−** and **+**, you can correct a missed comment in two seconds, and you keep your streak. |
+| **⌘+Enter clicks the LinkedIn button** | The shortcut makes the main action faster, but it does not make the action automatic. You write and send each comment yourself. For this reason, the extension does not go against the LinkedIn rules about automation. |
+| **Use the name "Comment Streak for LinkedIn"** | If a name starts with "LinkedIn", it looks like an official LinkedIn product. The Chrome Web Store can reject an extension for this reason. A name such as "X for LinkedIn" is safe for review, and people can find it when they search. The listing does not use the LinkedIn logo. |
+| **No account, no server, and few permissions** | LinkedIn contains much private data. For this reason, the extension reads only the address and the status of LinkedIn requests, and only on linkedin.com. Users can trust the extension, and the store review is easier. |
+| **Desktop only, and the documentation says this** | A Chrome extension cannot monitor the LinkedIn mobile app. This README and the store listing tell you this, so a low count is not a surprise. |
 
-## How it's built
+## Technical design
 
-- **Manifest V3, vanilla JavaScript, no build step, zero dependencies.** About 550 lines in total. The store package is about 11 KB.
-- **Counting without reading content.** The background service worker listens to `webRequest.onCompleted` on two LinkedIn URL patterns and looks only at each request's method, URL and status code. A comment counts when a `POST` to LinkedIn's create-comment action returns a 2xx status. It never reads request or response bodies.
-- **Works on both versions of LinkedIn's site.** LinkedIn's classic web app uses its Voyager REST API. Its newer web app sends every action to a single endpoint and names the action in an `sduiid` parameter. The matcher handles both, with a GraphQL fallback. Support for the newer app shipped in v1.1.0, because counting didn't work there before.
-- **No lost counts.** Storage writes go through a queue, so two comments posted seconds apart can't overwrite each other. A 2-second guard stops one comment from being counted twice.
-- **Sound from a service worker.** Manifest V3 service workers can't play audio, so the chime runs in an offscreen document. The Web Audio API generates it from sine tones and an overtone, so there are no sound files.
-- **Tested against real traffic.** The tests use request names captured on linkedin.com, including the lookalikes that must not count, and they also cover the streak and shading rules. They run on Node's built-in test runner.
-- **Built to be fixed fast.** The service worker logs every LinkedIn `POST` it sees. If LinkedIn changes its endpoint, the new request name appears in the console after a single test comment. [MAINTAINING.md](MAINTAINING.md) is the runbook.
-- **Store images from the real UI.** A script renders the actual popup in headless Chrome with a year of sample data, so the screenshots show the real product, not a mockup.
-- **Light and dark.** It follows the system theme and uses GitHub's contribution-graph palette.
-- **Release pipeline.** On every push, GitHub Actions validates the manifest and runs the tests. Pushing a `v*` tag builds the store zip and publishes a GitHub release, with notes taken from the changelog. The release fails if the tag and manifest versions disagree.
+- **Manifest V3, JavaScript only, no build step, no dependencies.** The code has approximately 550 lines. The store package is approximately 11 KB.
+- **The extension counts comments, but does not read them.** The background service worker monitors `webRequest.onCompleted` for two LinkedIn URL patterns. It reads only the method, the URL, and the status code of each request. When a `POST` to the LinkedIn create-comment action gives a 2xx status, the extension counts one comment. It does not read the body of a request or a response.
+- **Two versions of the LinkedIn website.** The classic LinkedIn web app uses the Voyager REST API. The new web app sends all actions to one endpoint, and an `sduiid` parameter gives the name of the action. The matcher function examines the two versions and has a GraphQL fallback. Version 1.1.0 added support for the new app. Before version 1.1.0, the extension did not count comments in the new app.
+- **No lost counts.** All storage writes go through a queue, so two comments that you post at almost the same time cannot overwrite each other. A 2-second guard makes sure that the extension counts each comment only one time.
+- **Sound from a service worker.** In Manifest V3, a service worker cannot play audio. For this reason, the sound plays in an offscreen document. The Web Audio API makes the sound from sine tones and one overtone, so the extension has no sound files.
+- **Tests with real data.** The tests use request names from linkedin.com. These names include the similar requests that the extension must not count. The tests also examine the streak and color rules. The tests use the built-in test runner of Node.
+- **Fast repairs.** The service worker records each LinkedIn `POST` request in the console. If LinkedIn changes its endpoint, the new request name shows in the console after one test comment. [MAINTAINING.md](MAINTAINING.md) gives the repair procedure.
+- **Store images from the real interface.** A script opens the real popup in headless Chrome with sample data for one year. Thus, the screenshots show the real product, not a mockup.
+- **Light and dark themes.** The extension uses the theme of your system and the colors of the GitHub contribution graph.
+- **Release pipeline.** For each push, GitHub Actions examines the manifest and runs the tests. When you push a `v*` tag, GitHub Actions makes the store zip file and publishes a GitHub release. The release notes come from the changelog. If the tag and the manifest version are different, the release stops.
 
 ## Go-to-market notes
 
-How I'd take this from side project to something people find:
+This section shows how I would change this side project into a product that people can find.
 
-- **Who it's for:** people who grow on LinkedIn by commenting. That means job seekers trying to get noticed by hiring managers, founders and B2B sellers doing social selling, and new creators building an audience before their own posts take off.
-- **Positioning:** for people building a LinkedIn presence one comment at a time, Comment Streak makes daily consistency visible. LinkedIn analytics tools track outputs you can't control (impressions, followers). Comment Streak tracks the input you can: comments. And unlike AI comment tools, it never writes anything for you.
-- **Discovery:** Chrome Web Store search comes first ("LinkedIn comments", "LinkedIn streak", "LinkedIn habit"), so the listing's name, summary and screenshots do most of the work. LinkedIn itself comes next. Growth coaches already tell their clients to comment every day, and this gives them a tool to recommend.
-- **The product markets itself:** for developers, a green contribution graph is already a status symbol. A shareable "90 days of comments" image, posted on LinkedIn, would reach exactly the people likely to install it.
-- **What I'd measure:** the extension has no analytics by design, so the Chrome Web Store dashboard is the scoreboard: weekly active users, installs against uninstalls, and rating. Activation is the first comment counted, which proves counting works for that user. Retention is still being active after 30 days. Anything deeper would need opt-in telemetry, and that would cost trust.
-- **Biggest risk:** dependence on LinkedIn's platform. LinkedIn can change its website at any time, and it already has once (v1.1.0). The safeguards: tests built on real request names, a debug log with a runbook, a manual fix for the count, and a planned self-check that flags when counting stops.
+- **Users:** Power users who write many comments each day to grow on LinkedIn. Examples:
+  - Creators who use comments as their main growth channel
+  - Founders and B2B sellers who use social selling at high volume
+  - Job seekers who write many comments to show their name to hiring managers
+- **Positioning:** For power users who make a LinkedIn presence with comments, Comment Streak shows daily consistency. LinkedIn analytics tools monitor results that you cannot control, such as views and followers. Comment Streak monitors the input that you can control: your comments. AI comment tools write comments for you. Comment Streak does not.
+- **Discovery:** The first channel is search in the Chrome Web Store, for example "LinkedIn comments", "LinkedIn streak", and "LinkedIn habit". For this reason, the name, summary, and screenshots of the listing do most of the work. The second channel is LinkedIn. Growth coaches tell their clients to write comments each day. This extension gives the coaches a tool to recommend.
+- **The product is its own marketing:** For software developers, a green contribution graph shows status. A future feature can make an image of your heatmap, for example "9,000 comments in 90 days". When users post this image on LinkedIn, it goes to the people who are most likely to install the extension.
+- **Metrics:** The extension has no analytics, and this is intentional. For this reason, the Chrome Web Store dashboard gives the metrics: weekly active users, installs compared with uninstalls, and rating.
+  - Activation: the extension counts the first comment of a user. This shows that the count operates for that user.
+  - Retention: the user is still active after 30 days.
+
+  For more detailed metrics, opt-in telemetry is necessary. Telemetry would decrease the trust of users.
+- **Largest risk:** The extension depends on the LinkedIn platform. LinkedIn can change its website at any time. This occurred one time before (version 1.1.0). These items decrease the risk:
+  - Tests that use real request names
+  - A debug log and a repair procedure
+  - Manual correction of the count
+  - A planned self-check that shows when the count stops
 
 ## Roadmap
 
-- Export and import your history as a file, so a new computer or a reinstall keeps your heatmap
-- Self-check: a "!" on the badge if you press Comment and nothing is counted, so a LinkedIn change gets caught in seconds rather than days
-- Weekly summary: this week compared with last week
-- Shareable heatmap image (the growth loop above)
-- Microsoft Edge Add-ons (the same package should work unchanged)
+- **Export and import.** Save your history as a file. Then you keep your heatmap on a new computer or after you install the extension again.
+- **Self-check.** If you click **Comment** and the extension does not count a comment, the badge shows "!". Thus, you see a LinkedIn change in seconds, not in days.
+- **Weekly summary.** Compare this week with last week.
+- **Heatmap image.** Make an image of your heatmap that you can share (the growth loop above).
+- **Microsoft Edge Add-ons.** I expect that the same package operates in Edge without changes.
 
-## Run it locally
+## Install from the source code
 
-1. Clone this repo.
-2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and choose the `extension/` folder.
-3. Pin it (puzzle-piece icon → pin **Comment Streak for LinkedIn**), then comment on linkedin.com.
+1. Clone this repository.
+2. In Chrome, open `chrome://extensions`.
+3. Set **Developer mode** to on.
+4. Click **Load unpacked**.
+5. Select the `extension/` folder.
+6. Click the puzzle-piece icon in the toolbar.
+7. Pin **Comment Streak for LinkedIn**.
+8. Post a comment on linkedin.com.
+9. Make sure that the count on the badge increases by 1.
 
-After pulling an update, click ↻ on the extension in `chrome://extensions` and refresh your LinkedIn tabs.
+After you pull an update:
+
+1. In `chrome://extensions`, click ↻ on the extension.
+2. Refresh your LinkedIn tabs.
 
 ```sh
-npm test                    # detection, streak and heatmap tests
-npm run check               # manifest and syntax checks
-npm run package             # build dist/linkedin-comment-streak-<version>.zip for the Chrome Web Store
-sh scripts/store-assets.sh  # regenerate store screenshots, promo tile and icons (macOS, needs Chrome)
+npm test                    # Run the tests for the count, streaks, and heatmap
+npm run check               # Examine the manifest and the syntax
+npm run package             # Make dist/linkedin-comment-streak-<version>.zip for the Chrome Web Store
+sh scripts/store-assets.sh  # Make the store images and icons again (macOS, Chrome is necessary)
 ```
 
-You don't need to run `npm install`, because there are no dependencies. Requires Node 20+.
+It is not necessary to run `npm install`, because the extension has no dependencies. Node 20 or later is necessary.
 
 ## Repository
 
 ```
-extension/              The extension (load this folder unpacked)
+extension/              The extension. Load this folder unpacked.
   manifest.json         MV3 manifest: permissions, linkedin.com host, popup
-  background.js         Service worker: detects comments, counts, badge, chime
-  lib.js                Shared logic: comment matcher, streaks, heatmap shades
-  content.js            ⌘+Enter shortcut on LinkedIn's comment box
-  popup.html/css/js     Heatmap, streaks and settings
-  offscreen.*, chime.js Chime playback (Web Audio, no sound files)
+  background.js         Service worker: finds comments, counts, badge, sound
+  lib.js                Shared logic: comment matcher, streaks, heatmap colors
+  content.js            ⌘+Enter shortcut for the LinkedIn comment box
+  popup.html/css/js     Heatmap, streaks, and settings
+  offscreen.*, chime.js Sound (Web Audio, no sound files)
   icons/
 tests/                  Logic tests (Node, no dependencies)
 scripts/                Manifest check, store zip, release notes, store images, icons
-store/                  Store screenshots, promo tile, icon and their HTML sources
-.github/workflows/      CI and tag-driven releases
-MAINTAINING.md          What breaks, how to fix it, how to release
-PUBLISHING.md           Chrome Web Store submission guide
+store/                  Store screenshots, promo tile, icon, and their HTML sources
+.github/workflows/      CI and releases from tags
+MAINTAINING.md          Failures, repairs, and the release procedure
+PUBLISHING.md           Chrome Web Store submission procedure
 PRIVACY.md              Privacy policy
 CHANGELOG.md            Release history
 ```
 
-## Versioning
+## Versions
 
-[Semantic Versioning](https://semver.org/), with `extension/manifest.json` as the source of truth. Every release is a tagged commit with a [changelog](CHANGELOG.md) entry and a GitHub release that has the store zip attached. The full process is in [MAINTAINING.md](MAINTAINING.md).
+The extension uses [Semantic Versioning](https://semver.org/). The version number in `extension/manifest.json` is the primary version number. All other version numbers must agree with it. Each release has a tagged commit, a [changelog](CHANGELOG.md) entry, and a GitHub release with the store zip file. [MAINTAINING.md](MAINTAINING.md) gives the full procedure.
 
 ## Credits
 
-- The heatmap: GitHub's contribution graph, including its colour palette.
-- Built by Ryan Dsouza, with [Claude Code](https://claude.com/claude-code) as pair programmer.
-- [MIT licensed](LICENSE). Not affiliated with or endorsed by LinkedIn.
+- Heatmap: the GitHub contribution graph and its colors.
+- Ryan Dsouza made this extension, with [Claude Code](https://claude.com/claude-code) as the pair programmer.
+- [MIT license](LICENSE). LinkedIn did not make this extension and has no connection with it.
