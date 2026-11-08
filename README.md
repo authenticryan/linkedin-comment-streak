@@ -16,7 +16,7 @@ Comment Streak is a Chrome extension that counts the comments you post on Linked
 
 Every guide to growing on LinkedIn gives the same advice: comment thoughtfully on other people's posts, every day. Comments start conversations with people you'd like to know, and they put your name in front of audiences that don't follow you yet, long before your own posts take off.
 
-So I set myself a goal of five comments a day, and then realised I couldn't tell whether I was hitting it. LinkedIn shows impressions on your posts, but it gives you no daily count of the comments you write. The habit only works if you keep it up every day, and that was the part I couldn't see.
+So I set myself a goal of one hundred comments a day, and then realised I couldn't tell whether I was hitting it. LinkedIn shows impressions on your posts, but it gives you no daily count of the comments you write. The habit only works if you keep it up every day, and that was the part I couldn't see.
 
 Developers already have a fix for this problem: GitHub's contribution graph. A green square for every day you showed up is a simple reason not to break the chain. So I built the same thing for LinkedIn comments. It counts on its own, so there's nothing to log, and it sits in the toolbar where I see it all day.
 
