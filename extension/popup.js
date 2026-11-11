@@ -60,26 +60,29 @@ $("goal").addEventListener("change", (e) => {
   else render();
 });
 $("sound").addEventListener("change", (e) => chrome.storage.local.set({ sound: e.target.checked }));
-// Click once for the normal ding, shift-click to hear the goal chime.
-$("testChime").addEventListener("click", (e) => playChime(e.shiftKey));
 $("celebrate").addEventListener("change", (e) => chrome.storage.local.set({ celebrate: e.target.checked }));
 
-// Shows the goal celebration on the LinkedIn tab you're looking at, as if
-// today's comment had just reached the goal.
-$("preview").addEventListener("click", async () => {
+// Click: the normal ding. Shift-click: the whole goal moment (goal chime and
+// celebration) on the LinkedIn tab you're looking at, as if today's comment
+// had just reached the goal. Off LinkedIn, Shift-click plays the chime only.
+$("testChime").addEventListener("click", async (e) => {
+  if (!e.shiftKey) return playChime(false);
+
   const { counts = {}, goal = DEFAULT_GOAL } = await chrome.storage.local.get(["counts", "goal"]);
   const key = dayKey();
   const data = celebration({ ...counts, [key]: Math.max(counts[key] || 0, goal) }, goal);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   try {
     await chrome.tabs.sendMessage(tab.id, { type: "celebrate", data });
+    chrome.runtime.sendMessage({ type: "goalChime" });
     window.close();
   } catch {
     // No listener: not LinkedIn, or a LinkedIn tab opened before this version.
+    playChime(true);
     const onLinkedIn = /^https:\/\/www\.linkedin\.com\//.test(tab?.url || "");
-    const btn = $("preview");
-    btn.textContent = onLinkedIn ? "Refresh LinkedIn first" : "Open LinkedIn first";
-    setTimeout(() => (btn.textContent = "Preview"), 2500);
+    const btn = $("testChime");
+    btn.textContent = onLinkedIn ? "Refresh LinkedIn to see it" : "Open LinkedIn to see it";
+    setTimeout(() => (btn.textContent = "Play"), 2500);
   }
 });
 $("plus").addEventListener("click", () => chrome.runtime.sendMessage({ type: "adjust", delta: 1 }));

@@ -40,11 +40,14 @@ async function ensureOffscreen() {
   await creating;
 }
 
+async function ring(goalHit) {
+  await ensureOffscreen();
+  await chrome.runtime.sendMessage({ target: "offscreen", type: "chime", goalHit });
+}
+
 async function chime(todayCount) {
   const { sound = true, goal = DEFAULT_GOAL } = await chrome.storage.local.get(["sound", "goal"]);
-  if (!sound) return;
-  await ensureOffscreen();
-  await chrome.runtime.sendMessage({ target: "offscreen", type: "chime", goalHit: todayCount === goal });
+  if (sound) await ring(todayCount === goal);
 }
 
 // --- Goal celebration ------------------------------------------------------
@@ -98,6 +101,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     adjustToday(msg.delta).then(() => sendResponse(true));
     return true;
   }
+  // Shift+Play in the popup: the goal chime, played here because the popup
+  // closes as soon as the celebration opens.
+  if (msg?.type === "goalChime") ring(true).catch((err) => console.warn("[LCS] chime failed", err));
 });
 
 chrome.storage.onChanged.addListener(() => refreshBadge());

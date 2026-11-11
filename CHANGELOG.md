@@ -3,7 +3,7 @@
 ## 1.4.0 — 2026-11-11
 
 - A goal celebration. When the comment that reaches your daily goal posts, LinkedIn dims and a card counts up to your goal, confetti made of heatmap squares bursts, and today's square fills in. The card shows your streak, how many goal days you have had, and the time you finished. It stays until you close it (button, Esc, or click outside), once per day.
-- "Celebrate goal" switch and a **Preview** button in the popup. Preview shows the celebration on the LinkedIn tab you are looking at.
+- "Celebrate goal" switch in the popup. Shift-click **Play** on a LinkedIn tab to preview the whole goal moment: the goal chime and the celebration.
 - No new permissions.
 
 ## 1.3.0 — 2026-11-08
