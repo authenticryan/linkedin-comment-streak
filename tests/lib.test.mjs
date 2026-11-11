@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isCommentCreate, computeStats, level, dayKey, addDays } from "../extension/lib.js";
+import { isCommentCreate, computeStats, celebration, level, dayKey, addDays } from "../extension/lib.js";
 
 const post = (url, statusCode = 200) => isCommentCreate({ method: "POST", statusCode, url });
 
@@ -55,4 +55,33 @@ test("streaks", () => {
 
 test("heatmap shades are relative to the goal", () => {
   assert.deepEqual([0, 1, 2, 3, 5, 9, 10].map((n) => level(n, 5)), [0, 1, 1, 2, 3, 3, 4]);
+});
+
+test("goal celebration: streak, record, goal days and the week strip", () => {
+  const now = new Date(2026, 10, 11, 16, 12); // a Wednesday
+  const today = new Date(2026, 10, 11);
+  const counts = {};
+  const set = (offset, n) => (counts[dayKey(addDays(today, offset))] = n);
+
+  // First goal day ever.
+  set(0, 100);
+  let c = celebration(counts, 100, now);
+  assert.equal(c.goalDays, 1);
+  assert.equal(c.streak, 1);
+  assert.equal(c.record, false, "a 1-day streak isn't a record");
+  assert.equal(c.prevLevel, 2, "99 of 100 was the shade before this comment");
+  assert.deepEqual(c.week.map((w) => w.day), [4, 5, 6, 0, 1, 2, 3]);
+  assert.equal(c.week[6].level, 3);
+
+  // A 3-day streak, beating an older 2-day streak: new record.
+  set(-1, 120); set(-2, 100); set(-3, 0); set(-10, 100); set(-11, 100);
+  c = celebration(counts, 100, now);
+  assert.equal(c.streak, 3);
+  assert.equal(c.record, true);
+  assert.equal(c.goalDays, 5);
+  assert.deepEqual(c.week.map((w) => w.level), [0, 0, 0, 0, 3, 3, 3]);
+
+  // Matching an older 3-day streak is not a new record.
+  set(-12, 100);
+  assert.equal(celebration(counts, 100, now).record, false);
 });

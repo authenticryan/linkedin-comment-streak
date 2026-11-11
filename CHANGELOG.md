@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 — 2026-11-11
+
+- A goal celebration. When the comment that reaches your daily goal posts, LinkedIn dims and a card counts up to your goal, confetti made of heatmap squares bursts, and today's square fills in. The card shows your streak, how many goal days you have had, and the time you finished. It stays until you close it (button, Esc, or click outside), once per day.
+- "Celebrate goal" switch and a **Preview** button in the popup. Preview shows the celebration on the LinkedIn tab you are looking at.
+- No new permissions.
+
 ## 1.3.0 — 2026-11-08
 
 - Built for power users: the default daily goal is now 100 comments (was 5), and you can set a goal up to 1,000 (was 100). A goal you already set doesn't change.

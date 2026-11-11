@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Comment Streak for LinkedIn",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Counts the LinkedIn comments you post on desktop and shows them as a GitHub-style heatmap.",
   "homepage_url": "https://github.com/authenticryan/linkedin-comment-streak",
   "minimum_chrome_version": "116",
@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["https://www.linkedin.com/*"],
-      "js": ["content.js"],
+      "js": ["content.js", "celebrate.js"],
       "run_at": "document_idle"
     }
   ],

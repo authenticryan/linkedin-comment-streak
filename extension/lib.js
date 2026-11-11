@@ -107,3 +107,28 @@ export function computeStats(counts, goal, now = new Date()) {
 
   return { today: c(today), current, longest, yearTotal, goalDays30 };
 }
+
+// What the goal-reached overlay shows, read right after today hits the goal.
+export function celebration(counts, goal, now = new Date()) {
+  const today = startOfDay(now);
+  const key = dayKey(today);
+  const s = computeStats(counts, goal, now);
+  // Longest streak before today, to tell if today set a new record.
+  const before = computeStats({ ...counts, [key]: 0 }, goal, now).longest;
+
+  const week = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = addDays(today, -i);
+    week.push({ day: d.getDay(), level: level(counts[dayKey(d)] || 0, goal) });
+  }
+
+  return {
+    goal,
+    streak: s.current,
+    record: s.current > 1 && s.current > before,
+    goalDays: Object.values(counts).filter((n) => n >= goal).length,
+    // Today's heatmap shade one comment ago, so the overlay can fill it in.
+    prevLevel: level(Math.max(0, (counts[key] || 0) - 1), goal),
+    week,
+  };
+}

@@ -1,4 +1,4 @@
-import { dayKey, addDays, startOfDay, computeStats, level, DEFAULT_GOAL } from "./lib.js";
+import { dayKey, addDays, startOfDay, computeStats, celebration, level, DEFAULT_GOAL } from "./lib.js";
 import { playChime } from "./chime.js";
 
 const $ = (id) => document.getElementById(id);
@@ -8,9 +8,15 @@ const monthFmt = new Intl.DateTimeFormat(undefined, { month: "short" });
 const days = (n) => `${n} ${n === 1 ? "day" : "days"}`;
 
 async function render() {
-  const { counts = {}, goal = DEFAULT_GOAL, sound = true } = await chrome.storage.local.get(["counts", "goal", "sound"]);
+  const { counts = {}, goal = DEFAULT_GOAL, sound = true, celebrate = true } = await chrome.storage.local.get([
+    "counts",
+    "goal",
+    "sound",
+    "celebrate",
+  ]);
   const s = computeStats(counts, goal);
   $("sound").checked = sound;
+  $("celebrate").checked = celebrate;
 
   $("todayCount").textContent = s.today;
   $("goalLabel").textContent = goal;
@@ -56,6 +62,26 @@ $("goal").addEventListener("change", (e) => {
 $("sound").addEventListener("change", (e) => chrome.storage.local.set({ sound: e.target.checked }));
 // Click once for the normal ding, shift-click to hear the goal chime.
 $("testChime").addEventListener("click", (e) => playChime(e.shiftKey));
+$("celebrate").addEventListener("change", (e) => chrome.storage.local.set({ celebrate: e.target.checked }));
+
+// Shows the goal celebration on the LinkedIn tab you're looking at, as if
+// today's comment had just reached the goal.
+$("preview").addEventListener("click", async () => {
+  const { counts = {}, goal = DEFAULT_GOAL } = await chrome.storage.local.get(["counts", "goal"]);
+  const key = dayKey();
+  const data = celebration({ ...counts, [key]: Math.max(counts[key] || 0, goal) }, goal);
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  try {
+    await chrome.tabs.sendMessage(tab.id, { type: "celebrate", data });
+    window.close();
+  } catch {
+    // No listener: not LinkedIn, or a LinkedIn tab opened before this version.
+    const onLinkedIn = /^https:\/\/www\.linkedin\.com\//.test(tab?.url || "");
+    const btn = $("preview");
+    btn.textContent = onLinkedIn ? "Refresh LinkedIn first" : "Open LinkedIn first";
+    setTimeout(() => (btn.textContent = "Preview"), 2500);
+  }
+});
 $("plus").addEventListener("click", () => chrome.runtime.sendMessage({ type: "adjust", delta: 1 }));
 $("minus").addEventListener("click", () => chrome.runtime.sendMessage({ type: "adjust", delta: -1 }));
 chrome.storage.onChanged.addListener(render);

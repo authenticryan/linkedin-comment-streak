@@ -35,6 +35,7 @@ I made the same type of graph for LinkedIn comments. At 100 comments each day, y
 
   The extension also shows your current streak and your longest streak. It also shows the number of days in the last 30 days that you reached your goal. Put the pointer on a day to see its count.
 - **A sound for each comment.** The extension plays a short two-note sound for each comment. When you reach your goal, it plays a brighter four-note sound. To hear the sound, click **Play**. To hear the goal sound, hold Shift and click **Play**. You can also set the sound to off.
+- **A celebration at the goal.** When you post the comment that completes your goal, the LinkedIn page goes dark. A card counts up to your goal. Then confetti in the heatmap colors bursts, and the square for today changes to green. The card shows your streak, your number of goal days, and the time that you completed the goal. The card stays until you close it. To see the card, click **Preview** in the popup. You can also set the celebration to off.
 - **⌘+Enter to post.** Press ⌘+Enter (Ctrl+Enter on Windows) to post the comment in the comment box.
 - **Manual correction.** If the count for today is not correct, use **−** and **+** to correct it.
 - **Privacy.** The extension has no account, no server, and no analytics. It does not read the text of your comments.
@@ -54,6 +55,7 @@ In a small product, the most important decisions are about what to remove. This 
 | **Keep the streak until the day ends** | If the streak changed to 0 each morning before your first comment, you would see this as a penalty. As on GitHub, the streak from yesterday continues until midnight. |
 | **Show "Goal hit, last 30 days" next to the streak** | If you miss one day, the streak changes to zero. At that time, many people stop. A value such as 25/30 shows that you are still consistent, so one bad day does not stop the habit. |
 | **Play a sound, and a brighter sound at the goal** | Immediate feedback helps people to continue a habit. The goal sound shows that you completed the goal for the day. The browser makes the sound, so the extension has no audio files. You can set the sound to off. |
+| **Celebrate the goal with a full-page moment** | 100 comments in one day is a lot of work. A badge that changes color does not show this. The card stops you for a few seconds, so you can feel the result. The confetti uses the heatmap squares, and the square for today changes to green, so the moment connects to your streak. The card shows one time each day, and it stays until you close it. It does not interrupt each comment. |
 | **Let users correct the count** | The count uses the LinkedIn website, and LinkedIn changes its website. With **−** and **+**, you can correct a missed comment in two seconds, and you keep your streak. |
 | **⌘+Enter clicks the LinkedIn button** | The shortcut makes the main action faster, but it does not make the action automatic. You write and send each comment yourself. For this reason, the extension does not go against the LinkedIn rules about automation. |
 | **Use the name "Comment Streak for LinkedIn"** | If a name starts with "LinkedIn", it looks like an official LinkedIn product. The Chrome Web Store can reject an extension for this reason. A name such as "X for LinkedIn" is safe for review, and people can find it when they search. The listing does not use the LinkedIn logo. |
@@ -62,7 +64,7 @@ In a small product, the most important decisions are about what to remove. This 
 
 ## Technical design
 
-- **Manifest V3, JavaScript only, no build step, no dependencies.** The code has approximately 550 lines. The store package is approximately 11 KB.
+- **Manifest V3, JavaScript only, no build step, no dependencies.** The code has approximately 1,000 lines. The store package is approximately 18 KB.
 - **The extension counts comments, but does not read them.** The background service worker monitors `webRequest.onCompleted` for two LinkedIn URL patterns. It reads only the method, the URL, and the status code of each request. When a `POST` to the LinkedIn create-comment action gives a 2xx status, the extension counts one comment. It does not read the body of a request or a response.
 - **Two versions of the LinkedIn website.** The classic LinkedIn web app uses the Voyager REST API. The new web app sends all actions to one endpoint, and an `sduiid` parameter gives the name of the action. The matcher function examines the two versions and has a GraphQL fallback. Version 1.1.0 added support for the new app. Before version 1.1.0, the extension did not count comments in the new app.
 - **No lost counts.** All storage writes go through a queue, so two comments that you post at almost the same time cannot overwrite each other. A 2-second guard makes sure that the extension counts each comment only one time.
@@ -137,6 +139,7 @@ extension/              The extension. Load this folder unpacked.
   background.js         Service worker: finds comments, counts, badge, sound
   lib.js                Shared logic: comment matcher, streaks, heatmap colors
   content.js            ⌘+Enter shortcut for the LinkedIn comment box
+  celebrate.js          Goal celebration on linkedin.com (overlay, confetti)
   popup.html/css/js     Heatmap, streaks, and settings
   offscreen.*, chime.js Sound (Web Audio, no sound files)
   icons/

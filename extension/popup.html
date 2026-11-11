@@ -38,8 +38,14 @@
   <footer>
     <span class="left">
       <label>Daily goal <input id="goal" type="number" min="1" max="1000" /></label>
-      <label class="sound"><input id="sound" type="checkbox" /> Chime</label>
-      <button id="testChime" class="text" title="Hear the chime">Play</button>
+      <span class="pair">
+        <label class="toggle"><input id="sound" type="checkbox" /> Chime</label>
+        <button id="testChime" class="text" title="Hear the chime">Play</button>
+      </span>
+      <span class="pair">
+        <label class="toggle"><input id="celebrate" type="checkbox" /> Celebrate goal</label>
+        <button id="preview" class="text" title="Show the goal celebration on your LinkedIn tab">Preview</button>
+      </span>
     </span>
     <span class="fix">Fix today's count
       <button id="minus" title="Remove one">−</button>

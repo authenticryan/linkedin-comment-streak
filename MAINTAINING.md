@@ -8,7 +8,8 @@ The code is small and has no dependencies. Nearly all future breakage comes from
 |---|---|---|
 | `extension/lib.js` → `isCommentCreate` | Decides whether a LinkedIn network request was "post a comment" | LinkedIn renames the action or moves the endpoint |
 | `extension/content.js` | ⌘+Enter finds and presses the Comment/Reply button | LinkedIn changes the comment box (labels, button text) |
-| `extension/background.js` | Counts, updates the badge, triggers the chime | Rarely: Chrome API changes |
+| `extension/background.js` | Counts, updates the badge, triggers the chime and the goal celebration | Rarely: Chrome API changes |
+| `extension/celebrate.js` | Goal celebration overlay on linkedin.com | Nothing external: it draws in its own shadow root |
 | `extension/popup.*` | Heatmap, streaks, settings | Nothing external |
 
 Today LinkedIn's web app posts a comment as:

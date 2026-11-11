@@ -138,6 +138,7 @@ input { width: 64px; margin-left: 6px; padding: 3px 6px; }
 button { width: 26px; height: 24px; margin-left: 4px; cursor: pointer; }
 button:hover { border-color: var(--accent); }
 .left { display: flex; align-items: center; gap: 16px; }
-.sound { display: flex; align-items: center; gap: 5px; cursor: pointer; }
-.sound input { width: auto; margin: 0; accent-color: var(--l3); }
-button.text { width: auto; padding: 0 10px; margin-left: -8px; }
+.pair { display: flex; align-items: center; gap: 8px; }
+.toggle { display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.toggle input { width: auto; margin: 0; accent-color: var(--l3); }
+button.text { width: auto; padding: 0 10px; margin-left: 0; }

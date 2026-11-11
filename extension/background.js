@@ -1,4 +1,4 @@
-import { dayKey, isCommentCreate, DEFAULT_GOAL } from "./lib.js";
+import { dayKey, isCommentCreate, celebration, DEFAULT_GOAL } from "./lib.js";
 
 // Serialise writes so two quick comments can't overwrite each other.
 // Resolves with today's new count.
@@ -47,16 +47,37 @@ async function chime(todayCount) {
   await chrome.runtime.sendMessage({ target: "offscreen", type: "chime", goalHit: todayCount === goal });
 }
 
+// --- Goal celebration ------------------------------------------------------
+
+// Shows the goal-reached overlay (celebrate.js) on the tab where the comment
+// was posted. Once per day and goal, even if the count is fixed down and back.
+async function showCelebration(tabId, todayCount) {
+  if (tabId < 0) return;
+  const { counts = {}, goal = DEFAULT_GOAL, celebrate = true, celebrated } = await chrome.storage.local.get([
+    "counts",
+    "goal",
+    "celebrate",
+    "celebrated",
+  ]);
+  const mark = `${dayKey()}/${goal}`;
+  if (!celebrate || todayCount !== goal || celebrated === mark) return;
+  // Fails if the tab was open before the extension was installed or updated.
+  await chrome.tabs.sendMessage(tabId, { type: "celebrate", data: celebration(counts, goal) });
+  await chrome.storage.local.set({ celebrated: mark });
+}
+
 // --- Detection -------------------------------------------------------------
 
 let lastCountedAt = 0;
-async function onComment() {
+async function onComment(tabId) {
   // Guard against one comment triggering two matching requests.
   if (Date.now() - lastCountedAt < 2000) return;
   lastCountedAt = Date.now();
   console.info("[LCS] comment counted");
   const n = await adjustToday(1);
-  if (n) chime(n).catch((err) => console.warn("[LCS] chime failed", err));
+  if (!n) return;
+  chime(n).catch((err) => console.warn("[LCS] chime failed", err));
+  showCelebration(tabId, n).catch((err) => console.warn("[LCS] celebration failed", err));
 }
 
 // Watch LinkedIn's own API calls. Only the URL, method and status are read.
@@ -67,7 +88,7 @@ chrome.webRequest.onCompleted.addListener(
       const u = new URL(details.url);
       console.debug("[LCS] POST", details.statusCode, u.pathname, u.searchParams.get("sduiid") || "");
     }
-    if (isCommentCreate(details)) onComment();
+    if (isCommentCreate(details)) onComment(details.tabId);
   },
   { urls: ["https://www.linkedin.com/voyager/api/*", "https://www.linkedin.com/flagship-web/*"] }
 );
