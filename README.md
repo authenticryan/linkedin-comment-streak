@@ -43,6 +43,11 @@ I made the same type of graph for LinkedIn comments. At 100 comments each day, y
 
 ![The goal celebration: a dark card shows 100 comments today, the text "You showed up 100 times today.", a 24-day streak, and the 131st goal day](store/screenshot-2-1280x800.png)
 
+<p>
+  <img src="store/screenshot-3-1280x800.png" width="49%" alt="Backup and sync: the panel shows 14,049 comments over 193 days, saved on the server from 2 computers, with the text Matches this popup">
+  <img src="store/screenshot-4-1280x800.png" width="49%" alt="The popup in the dark theme: 80 of 100 comments today, a 23-day streak, and the heatmap for one year">
+</p>
+
 ## Product decisions
 
 In a small product, the most important decisions are about what to remove. This table gives each decision and the reason for it.
@@ -69,7 +74,7 @@ In a small product, the most important decisions are about what to remove. This 
 
 ## Technical design
 
-- **Manifest V3, JavaScript only, no build step, no dependencies.** The extension has approximately 1,400 lines. The store package is approximately 24 KB.
+- **Manifest V3, JavaScript only, no build step, no dependencies.** The extension has approximately 1,500 lines. The store package is approximately 25 KB.
 - **The extension counts comments, but does not read them.** The background service worker monitors `webRequest.onCompleted` for two LinkedIn URL patterns. It reads only the method, the URL, and the status code of each request. When a `POST` to the LinkedIn create-comment action gives a 2xx status, the extension counts one comment. It does not read the body of a request or a response.
 - **Two versions of the LinkedIn website.** The classic LinkedIn web app uses the Voyager REST API. The new web app sends all actions to one endpoint, and an `sduiid` parameter gives the name of the action. The matcher function examines the two versions and has a GraphQL fallback. Version 1.1.0 added support for the new app. Before version 1.1.0, the extension did not count comments in the new app.
 - **No lost counts.** All storage writes go through a queue, so two comments that you post at almost the same time cannot overwrite each other. A 2-second guard makes sure that the extension counts each comment only one time.
@@ -81,7 +86,7 @@ In a small product, the most important decisions are about what to remove. This 
 - **Server tests with real Postgres.** The server tests run all of the SQL against PGlite. PGlite is Postgres compiled to WebAssembly, so the tests need no database server. The tests examine sign-in, rate limits, the sync between two computers, the goal, consent, and the deletion of an account.
 - **Sync that repairs itself.** Each sync sends all of the counts of the computer (a few KB), not only the changes. If one sync fails, the next sync makes the server correct again. While you comment, a sync occurs a maximum of one time each hour. The count on your computer changes immediately. Only the copy on the server waits. This decreases the server requests by approximately 15 times, so that the free plans can support more users.
 - **Light and dark themes.** The extension uses the theme of your system and the colors of the GitHub contribution graph.
-- **Release pipeline.** For each push, GitHub Actions examines the manifest and runs the tests. When you push a `v*` tag, GitHub Actions makes the store zip file and publishes a GitHub release. The release notes come from the changelog. If the tag and the manifest version are different, the release stops.
+- **Release pipeline.** For each push, GitHub Actions examines the manifest. It also runs the tests for the extension, the sync server, and the landing page. When you push a `v*` tag, GitHub Actions makes the store zip file and publishes a GitHub release. The release notes come from the changelog. If the tag and the manifest version are different, the release stops.
 
 ## Go-to-market notes
 
@@ -105,6 +110,20 @@ This section shows how I would change this side project into a product that peop
   - A debug log and a repair procedure
   - Manual correction of the count
   - A planned self-check that shows when the count stops
+
+## Relink, the paid product
+
+Comment Streak helps you start more conversations on LinkedIn. Many of these conversations then continue in the LinkedIn inbox. The inbox has no follow-up system, so replies come late or never. Relink is my paid product for this problem. It changes the LinkedIn inbox into a follow-up list. Each conversation gets a date, and it comes back on that date.
+
+The Relink app is in private development. Its landing page and waitlist are live at **[tryrelink.live](https://tryrelink.live)**. The code and the copy decisions are in [`site/`](site/).
+
+[![The Relink share image: the headline "Never send 'Sorry for the late reply' again." next to an inbox where each conversation has a due date](site/public/og.png)](https://tryrelink.live)
+
+- **Model:** Comment Streak is free and stays free. Relink is paid. The early price goes only to people on the waitlist.
+- **Audience:** Founders. They get customers, investors, and hires from the LinkedIn inbox, so a late reply can cost a deal.
+- **Message:** "Never send 'Sorry for the late reply' again." The copy uses Jobs to be Done: it starts with the moment that the product removes.
+- **Proof:** A live counter shows the real number of people on the waitlist. At 0, it asks the visitor to be the first.
+- **Demo:** The page has an inbox that visitors control with the keyboard, so they use the product before they sign up.
 
 ## Roadmap
 
@@ -159,6 +178,11 @@ server/                 Optional sync server (Vercel Functions, Neon, Resend)
   lib/app.js            Sign-in, sync, and account logic
   schema.sql            Database tables
   test/                 API tests against real Postgres (PGlite)
+site/                   Relink landing page and waitlist (tryrelink.live)
+  public/               The page: HTML, CSS, and JavaScript, no build step
+  api/waitlist.js       Waitlist API (Vercel Functions, Neon)
+  brand/                The Relink logo and its render script
+  test/                 Waitlist API tests against real Postgres (PGlite)
 tests/                  Logic tests (Node, no dependencies)
 scripts/                Manifest check, store zip, release notes, store images, icons
 store/                  Store screenshots, promo tile, icon, and their HTML sources
