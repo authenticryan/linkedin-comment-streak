@@ -23,9 +23,10 @@
   window.chrome = {
     storage: {
       local: { get: async () => ({ counts, goal: 100, sound: true }), set: async () => {} },
+      session: { get: async () => ({}) },
       onChanged: { addListener() {} },
     },
-    runtime: { sendMessage() {} },
+    runtime: { sendMessage: async () => ({ ok: true }) },
   };
 
   const style = document.createElement("style");

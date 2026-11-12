@@ -4,3 +4,6 @@ node_modules/
 *.zip
 *.pem
 store/src/popup-demo.html
+.env
+.env.*
+.vercel

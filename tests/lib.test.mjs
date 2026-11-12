@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isCommentCreate, computeStats, celebration, level, dayKey, addDays } from "../extension/lib.js";
+import { isCommentCreate, computeStats, celebration, totalCounts, level, dayKey, addDays } from "../extension/lib.js";
 
 const post = (url, statusCode = 200) => isCommentCreate({ method: "POST", statusCode, url });
 
@@ -84,4 +84,13 @@ test("goal celebration: streak, record, goal days and the week strip", () => {
   // Matching an older 3-day streak is not a new record.
   set(-12, 100);
   assert.equal(celebration(counts, 100, now).record, false);
+});
+
+test("synced totals: this computer plus the others", () => {
+  const mine = { "2026-11-10": 60, "2026-11-11": 30 };
+  const others = { "2026-11-11": 70, "2026-11-09": 100 };
+  assert.deepEqual(totalCounts(mine, others), { "2026-11-09": 100, "2026-11-10": 60, "2026-11-11": 100 });
+  assert.deepEqual(totalCounts(mine), mine, "not signed in");
+  assert.deepEqual(totalCounts(undefined, others), others, "new computer");
+  assert.deepEqual(mine, { "2026-11-10": 60, "2026-11-11": 30 }, "inputs unchanged");
 });

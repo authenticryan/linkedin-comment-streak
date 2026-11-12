@@ -8,7 +8,7 @@ Comment Streak is a Chrome extension. It counts the comments that you post on Li
 
 ![Comment Streak popup: 80 of 100 comments today, a current streak of 23 days, the goal on 25 of the last 30 days, and 14,049 comments on a green heatmap for one year](store/screenshot-1-1280x800.png)
 
-**Chrome Web Store:** in review · **Download:** [latest release](https://github.com/authenticryan/linkedin-comment-streak/releases/latest) · **Privacy:** [no data goes out of your browser](PRIVACY.md)
+**Chrome Web Store:** in review · **Download:** [latest release](https://github.com/authenticryan/linkedin-comment-streak/releases/latest) · **Privacy:** [no data goes out of your browser unless you turn on sync](PRIVACY.md)
 
 ---
 
@@ -38,7 +38,8 @@ I made the same type of graph for LinkedIn comments. At 100 comments each day, y
 - **A celebration at the goal.** When you post the comment that completes your goal, the LinkedIn page goes dark. A card counts up to your goal. Then confetti in the heatmap colors bursts, and the square for today changes to green. The card shows your streak, your number of goal days, and the time that you completed the goal. The card stays until you close it. To see the full goal moment, open LinkedIn, hold Shift, and click **Play** in the popup. You can also set the celebration to off.
 - **⌘+Enter to post.** Press ⌘+Enter (Ctrl+Enter on Windows) to post the comment in the comment box.
 - **Manual correction.** If the count for today is not correct, use **−** and **+** to correct it.
-- **Privacy.** The extension has no account, no server, and no analytics. It does not read the text of your comments.
+- **Backup and sync (optional).** Click **Back up & sync** in the popup and type your email. The extension sends a 6-digit code to your email. Type the code in the popup. Your counts and your goal then sync between your computers. If you use a new computer, sign in, and your heatmap comes back. The extension works the same without an account.
+- **Privacy.** The extension has no analytics. It does not read the text of your comments. Without sync, no data goes out of your browser. With sync, the server stores only your email, your counts for each day, and your goal.
 
 ![Dark theme: a sound for each comment, the badge shows the count for today, and ⌘+Enter posts the comment](store/screenshot-2-1280x800.png)
 
@@ -59,12 +60,16 @@ In a small product, the most important decisions are about what to remove. This 
 | **Let users correct the count** | The count uses the LinkedIn website, and LinkedIn changes its website. With **−** and **+**, you can correct a missed comment in two seconds, and you keep your streak. |
 | **⌘+Enter clicks the LinkedIn button** | The shortcut makes the main action faster, but it does not make the action automatic. You write and send each comment yourself. For this reason, the extension does not go against the LinkedIn rules about automation. |
 | **Use the name "Comment Streak for LinkedIn"** | If a name starts with "LinkedIn", it looks like an official LinkedIn product. The Chrome Web Store can reject an extension for this reason. A name such as "X for LinkedIn" is safe for review, and people can find it when they search. The listing does not use the LinkedIn logo. |
-| **No account, no server, and few permissions** | LinkedIn contains much private data. For this reason, the extension reads only the address and the status of LinkedIn requests, and only on linkedin.com. Users can trust the extension, and the store review is easier. |
+| **Few permissions** | LinkedIn contains much private data. For this reason, the extension reads only the address and the status of LinkedIn requests, and only on linkedin.com. Users can trust the extension, and the store review is easier. Sync did not add a permission: the server allows requests from the extension (CORS). |
+| **Make the account optional** | The first promise of the extension was "no data goes out of your browser". Sync must not break this promise for users who do not want it. Thus, the extension works fully without an account, and sync is an extra. |
+| **Sign in with an emailed code, not a password or a magic link** | A password is one more thing to remember for a free tool. A magic link opens in the browser where you read your email, and this is often a phone. The phone cannot give the sign-in to the extension on your computer. A 6-digit code operates on all devices. The code also shows in the subject of the email, so you can read it in a phone notification. |
+| **Count for each computer, and add on the server** | If two computers send "today: 40" and "today: 25", one number must not replace the other. Each computer writes only its own rows, and the server adds the rows. Thus, no change from one computer can remove a change from another computer. |
+| **Ask for product-update consent at sign-up** | A later CRM (Twenty) can send emails only to users who agreed. It is not possible to get this consent from earlier users after the sign-up. Thus, the sign-up form has a check box for updates. The check box is empty by default. |
 | **Desktop only, and the documentation says this** | A Chrome extension cannot monitor the LinkedIn mobile app. This README and the store listing tell you this, so a low count is not a surprise. |
 
 ## Technical design
 
-- **Manifest V3, JavaScript only, no build step, no dependencies.** The code has approximately 1,000 lines. The store package is approximately 18 KB.
+- **Manifest V3, JavaScript only, no build step, no dependencies.** The extension has approximately 1,400 lines. The store package is approximately 24 KB.
 - **The extension counts comments, but does not read them.** The background service worker monitors `webRequest.onCompleted` for two LinkedIn URL patterns. It reads only the method, the URL, and the status code of each request. When a `POST` to the LinkedIn create-comment action gives a 2xx status, the extension counts one comment. It does not read the body of a request or a response.
 - **Two versions of the LinkedIn website.** The classic LinkedIn web app uses the Voyager REST API. The new web app sends all actions to one endpoint, and an `sduiid` parameter gives the name of the action. The matcher function examines the two versions and has a GraphQL fallback. Version 1.1.0 added support for the new app. Before version 1.1.0, the extension did not count comments in the new app.
 - **No lost counts.** All storage writes go through a queue, so two comments that you post at almost the same time cannot overwrite each other. A 2-second guard makes sure that the extension counts each comment only one time.
@@ -72,6 +77,9 @@ In a small product, the most important decisions are about what to remove. This 
 - **Tests with real data.** The tests use request names from linkedin.com. These names include the similar requests that the extension must not count. The tests also examine the streak and color rules. The tests use the built-in test runner of Node.
 - **Fast repairs.** The service worker records each LinkedIn `POST` request in the console. If LinkedIn changes its endpoint, the new request name shows in the console after one test comment. [MAINTAINING.md](MAINTAINING.md) gives the repair procedure.
 - **Store images from the real interface.** A script opens the real popup in headless Chrome with sample data for one year. Thus, the screenshots show the real product, not a mockup.
+- **Sync server with one dependency.** The optional sync server is in `server/`. It runs on Vercel Functions, stores data in Neon Postgres, and sends sign-in codes with Resend. It uses no framework and no authentication library. Its only runtime dependency is the Neon database driver. The server keeps codes and session tokens only as hashes. Each code operates one time, for 10 minutes, for a maximum of 5 attempts. The server sends a maximum of 5 codes for each email in one hour.
+- **Server tests with real Postgres.** The server tests run all of the SQL against PGlite. PGlite is Postgres compiled to WebAssembly, so the tests need no database server. The tests examine sign-in, rate limits, the sync between two computers, the goal, consent, and the deletion of an account.
+- **Sync that repairs itself.** Each sync sends all of the counts of the computer (a few KB), not only the changes. If one sync fails, the next sync makes the server correct again. A sync occurs a maximum of one time each 30 seconds. Thus, the database sleeps for most of the day and stays in the free plan.
 - **Light and dark themes.** The extension uses the theme of your system and the colors of the GitHub contribution graph.
 - **Release pipeline.** For each push, GitHub Actions examines the manifest and runs the tests. When you push a `v*` tag, GitHub Actions makes the store zip file and publishes a GitHub release. The release notes come from the changelog. If the tag and the manifest version are different, the release stops.
 
@@ -86,11 +94,12 @@ This section shows how I would change this side project into a product that peop
 - **Positioning:** For power users who make a LinkedIn presence with comments, Comment Streak shows daily consistency. LinkedIn analytics tools monitor results that you cannot control, such as views and followers. Comment Streak monitors the input that you can control: your comments. AI comment tools write comments for you. Comment Streak does not.
 - **Discovery:** The first channel is search in the Chrome Web Store, for example "LinkedIn comments", "LinkedIn streak", and "LinkedIn habit". For this reason, the name, summary, and screenshots of the listing do most of the work. The second channel is LinkedIn. Growth coaches tell their clients to write comments each day. This extension gives the coaches a tool to recommend.
 - **The product is its own marketing:** For software developers, a green contribution graph shows status. A future feature can make an image of your heatmap, for example "9,000 comments in 90 days". When users post this image on LinkedIn, it goes to the people who are most likely to install the extension.
-- **Metrics:** The extension has no analytics, and this is intentional. For this reason, the Chrome Web Store dashboard gives the metrics: weekly active users, installs compared with uninstalls, and rating.
+- **Metrics:** The extension has no analytics, and this is intentional. For this reason, the Chrome Web Store dashboard gives the metrics: weekly active users, installs compared with uninstalls, and rating. Sync gives two more metrics: the number of accounts, and the number of users who agreed to get product updates.
   - Activation: the extension counts the first comment of a user. This shows that the count operates for that user.
   - Retention: the user is still active after 30 days.
 
   For more detailed metrics, opt-in telemetry is necessary. Telemetry would decrease the trust of users.
+- **CRM:** The users table is in my own Postgres database. When the extension has more than 1,000 accounts, I will connect it to Twenty, an open-source CRM that I can host myself. The CRM will manage the relationship with users who agreed to get updates. The extension stays free.
 - **Largest risk:** The extension depends on the LinkedIn platform. LinkedIn can change its website at any time. This occurred one time before (version 1.1.0). These items decrease the risk:
   - Tests that use real request names
   - A debug log and a repair procedure
@@ -99,7 +108,7 @@ This section shows how I would change this side project into a product that peop
 
 ## Roadmap
 
-- **Export and import.** Save your history as a file. Then you keep your heatmap on a new computer or after you install the extension again.
+- **Export.** Save your history as a file, for users who do not want an account.
 - **Self-check.** If you click **Comment** and the extension does not count a comment, the badge shows "!". Thus, you see a LinkedIn change in seconds, not in days.
 - **Weekly summary.** Compare this week with last week.
 - **Heatmap image.** Make an image of your heatmap that you can share (the growth loop above).
@@ -138,11 +147,18 @@ extension/              The extension. Load this folder unpacked.
   manifest.json         MV3 manifest: permissions, linkedin.com host, popup
   background.js         Service worker: finds comments, counts, badge, sound
   lib.js                Shared logic: comment matcher, streaks, heatmap colors
+  sync.js               Optional sign-in and sync (runs in the background worker)
+  config.js             Address of the sync server
   content.js            ⌘+Enter shortcut for the LinkedIn comment box
   celebrate.js          Goal celebration on linkedin.com (overlay, confetti)
   popup.html/css/js     Heatmap, streaks, and settings
   offscreen.*, chime.js Sound (Web Audio, no sound files)
   icons/
+server/                 Optional sync server (Vercel Functions, Neon, Resend)
+  api/                  One file for each endpoint
+  lib/app.js            Sign-in, sync, and account logic
+  schema.sql            Database tables
+  test/                 API tests against real Postgres (PGlite)
 tests/                  Logic tests (Node, no dependencies)
 scripts/                Manifest check, store zip, release notes, store images, icons
 store/                  Store screenshots, promo tile, icon, and their HTML sources

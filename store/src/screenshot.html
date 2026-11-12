@@ -37,7 +37,7 @@
       <li>Counts every comment, even at 100+ a day</li>
       <li>Heatmap shaded by your daily goal</li>
       <li>Current and longest streaks</li>
-      <li>Private: nothing leaves your browser</li>
+      <li>Private by default. Sync is optional.</li>
     </ul>
   </div>
   <div class="popup"><iframe src="popup-demo.html" title="Extension popup"></iframe></div>
@@ -45,7 +45,7 @@
     if (new URLSearchParams(location.search).get("v") === "2") {
       document.getElementById("headline").textContent = "A ding for every comment. Keep the streak alive.";
       document.getElementById("points").innerHTML =
-        "<li>Soft chime per comment, bigger one at your goal</li><li>Badge shows today's count at a glance</li><li>⌘+Enter posts the comment you're typing</li><li>No account, no server, no tracking</li>";
+        "<li>Soft chime per comment, bigger one at your goal</li><li>Badge shows today's count at a glance</li><li>⌘+Enter posts the comment you're typing</li><li>Optional sync. No tracking.</li>";
     }
   </script>
 </body>

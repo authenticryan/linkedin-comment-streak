@@ -10,12 +10,16 @@
   --l2: #40c463;
   --l3: #30a14e;
   --l4: #216e39;
+  --danger: #cf222e;
+  --warn: #bf8700;
   --cell: 10px;
   --gap: 3px;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --danger: #f85149;
+    --warn: #d29922;
     --bg: #0d1117;
     --fg: #e6edf3;
     --muted: #8d96a0;
@@ -33,6 +37,7 @@
 * { box-sizing: border-box; }
 
 body {
+  position: relative;
   margin: 0;
   width: 790px;
   padding: 18px 20px 14px;
@@ -142,3 +147,65 @@ button:hover { border-color: var(--accent); }
 .toggle { display: flex; align-items: center; gap: 5px; cursor: pointer; }
 .toggle input { width: auto; margin: 0; accent-color: var(--l3); }
 button.text { width: auto; padding: 0 10px; margin-left: 0; }
+
+/* --- Back up & sync ------------------------------------------------------ */
+
+.account {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  height: 24px;
+  margin: 0;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  border-radius: 999px;
+}
+.account:hover { color: var(--fg); }
+.account .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: .6; }
+.account.on .dot { background: var(--l3); opacity: 1; }
+.account.warn .dot { background: var(--warn); opacity: 1; }
+
+dialog {
+  width: 380px;
+  padding: 20px 22px 16px;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 25%);
+}
+dialog::backdrop { background: rgb(1 4 9 / 45%); }
+dialog section { display: none; }
+dialog[data-step="email"] section[data-step="email"],
+dialog[data-step="code"] section[data-step="code"],
+dialog[data-step="account"] section[data-step="account"] { display: block; }
+dialog h2 { margin: 0 24px 6px 0; font-size: 16px; font-weight: 650; }
+dialog p { margin: 0 0 12px; color: var(--muted); }
+dialog b { color: var(--fg); font-weight: 600; }
+dialog .toggle { margin: 0 0 12px; }
+dialog input[type="email"], #code { display: block; width: 100%; margin: 0 0 10px; padding: 7px 10px; font-size: 14px; }
+#code { font-size: 22px; letter-spacing: 8px; text-align: center; font-variant-numeric: tabular-nums; }
+dialog button { width: auto; height: 30px; margin: 0; padding: 0 12px; }
+button.primary { width: 100%; height: 34px; color: #fff; font-weight: 600; background: #1f883d; border-color: transparent; }
+button.primary:hover { background: #1a7f37; border-color: transparent; }
+button:disabled { opacity: .6; cursor: default; }
+button.link { height: auto; padding: 0; color: var(--accent); background: none; border: 0; font-size: 12px; }
+button.link:hover { text-decoration: underline; }
+button.danger { color: var(--danger); }
+dialog .close { position: absolute; top: 10px; right: 10px; width: 26px; height: 26px; padding: 0; font-size: 16px; line-height: 1; }
+dialog .row { display: flex; gap: 8px; margin: 0 0 14px; }
+dialog .fine, dialog .links { margin: 12px 0 0; font-size: 12px; }
+dialog a { color: var(--accent); }
+.saved { margin: 0 0 12px; padding: 9px 12px; background: var(--tile); border: 1px solid var(--border); border-radius: 8px; }
+.saved .top, .saved .meta { color: var(--muted); font-size: 12px; }
+.saved .top { display: flex; justify-content: space-between; gap: 8px; }
+.saved .value { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.saved .ok { color: var(--l3); font-weight: 600; }
+.note { margin: 10px 0 0 !important; font-size: 12px; }
+.note:empty { display: none; }
+.note.error { color: var(--danger); }

@@ -1,4 +1,15 @@
-import { dayKey, isCommentCreate, celebration, DEFAULT_GOAL } from "./lib.js";
+import { dayKey, isCommentCreate, celebration, totalCounts, DEFAULT_GOAL } from "./lib.js";
+import {
+  startLogin,
+  resendCode,
+  cancelLogin,
+  verifyLogin,
+  signOut,
+  setMarketing,
+  deleteAccount,
+  syncNow,
+  syncSoon,
+} from "./sync.js";
 
 // Serialise writes so two quick comments can't overwrite each other.
 // Resolves with today's new count.
@@ -12,15 +23,22 @@ function adjustToday(delta) {
       if (next) counts[key] = next;
       else delete counts[key];
       await chrome.storage.local.set({ counts });
+      syncSoon();
       return next;
     })
     .catch((err) => console.error("[LCS] save failed", err));
   return queue;
 }
 
+// Everything the user sees: this computer plus their other synced computers.
+async function totals() {
+  const { counts = {}, remote = {} } = await chrome.storage.local.get(["counts", "remote"]);
+  return totalCounts(counts, remote);
+}
+
 async function refreshBadge() {
-  const { counts = {}, goal = DEFAULT_GOAL } = await chrome.storage.local.get(["counts", "goal"]);
-  const n = counts[dayKey()] || 0;
+  const { goal = DEFAULT_GOAL } = await chrome.storage.local.get("goal");
+  const n = (await totals())[dayKey()] || 0;
   await chrome.action.setBadgeText({ text: n ? String(n) : "" });
   await chrome.action.setBadgeBackgroundColor({ color: n >= goal ? "#1a7f37" : "#0a66c2" });
 }
@@ -56,8 +74,7 @@ async function chime(todayCount) {
 // was posted. Once per day and goal, even if the count is fixed down and back.
 async function showCelebration(tabId, todayCount) {
   if (tabId < 0) return;
-  const { counts = {}, goal = DEFAULT_GOAL, celebrate = true, celebrated } = await chrome.storage.local.get([
-    "counts",
+  const { goal = DEFAULT_GOAL, celebrate = true, celebrated } = await chrome.storage.local.get([
     "goal",
     "celebrate",
     "celebrated",
@@ -65,7 +82,7 @@ async function showCelebration(tabId, todayCount) {
   const mark = `${dayKey()}/${goal}`;
   if (!celebrate || todayCount !== goal || celebrated === mark) return;
   // Fails if the tab was open before the extension was installed or updated.
-  await chrome.tabs.sendMessage(tabId, { type: "celebrate", data: celebration(counts, goal) });
+  await chrome.tabs.sendMessage(tabId, { type: "celebrate", data: celebration(await totals(), goal) });
   await chrome.storage.local.set({ celebrated: mark });
 }
 
@@ -77,8 +94,9 @@ async function onComment(tabId) {
   if (Date.now() - lastCountedAt < 2000) return;
   lastCountedAt = Date.now();
   console.info("[LCS] comment counted");
-  const n = await adjustToday(1);
-  if (!n) return;
+  if (!(await adjustToday(1))) return;
+  // The goal counts comments from all your computers, so use the total.
+  const n = (await totals())[dayKey()] || 0;
   chime(n).catch((err) => console.warn("[LCS] chime failed", err));
   showCelebration(tabId, n).catch((err) => console.warn("[LCS] celebration failed", err));
 }
@@ -104,15 +122,45 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   // Shift+Play in the popup: the goal chime, played here because the popup
   // closes as soon as the celebration opens.
   if (msg?.type === "goalChime") ring(true).catch((err) => console.warn("[LCS] chime failed", err));
+
+  // Sign-in and sync actions from the popup. Answers { ok } or { ok: false, error }.
+  const action = ACCOUNT_ACTIONS[msg?.type];
+  if (action) {
+    action(msg).then(
+      () => sendResponse({ ok: true }),
+      (err) => sendResponse({ ok: false, error: err.code || "server_error" })
+    );
+    return true;
+  }
 });
+
+const ACCOUNT_ACTIONS = {
+  "auth:start": (m) => startLogin(m.email, m.marketing),
+  "auth:resend": () => resendCode(),
+  "auth:cancel": () => cancelLogin(),
+  "auth:verify": (m) => verifyLogin(m.code),
+  "auth:signout": () => signOut(),
+  "account:marketing": (m) => setMarketing(Boolean(m.value)),
+  "account:delete": () => deleteAccount(),
+  "sync:now": () => syncNow(),
+  "sync:soon": () => syncSoon(),
+  // The popup opened: get the other computers' latest, unless we just did.
+  "sync:pull": async () => {
+    const { sync } = await chrome.storage.local.get("sync");
+    if (!sync?.at || Date.now() - sync.at > 60_000) await syncNow();
+  },
+};
 
 chrome.storage.onChanged.addListener(() => refreshBadge());
 
-// Reset the badge after midnight.
-chrome.alarms.onAlarm.addListener(() => refreshBadge());
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "sync") syncNow().catch(() => {});
+  else refreshBadge(); // the 15-minute alarm resets the badge after midnight
+});
 function setup() {
   chrome.alarms.create("badge", { periodInMinutes: 15 });
   refreshBadge();
+  syncNow().catch(() => {});
 }
 chrome.runtime.onInstalled.addListener(setup);
 chrome.runtime.onStartup.addListener(setup);

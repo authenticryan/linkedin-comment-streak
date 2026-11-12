@@ -132,3 +132,11 @@ export function celebration(counts, goal, now = new Date()) {
     week,
   };
 }
+
+// This computer's counts plus the totals from the user's other computers
+// (from sync). Everything the user sees is based on this.
+export function totalCounts(local = {}, remote = {}) {
+  const out = { ...local };
+  for (const [day, n] of Object.entries(remote)) out[day] = (out[day] || 0) + n;
+  return out;
+}

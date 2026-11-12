@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0 — 2026-11-12
+
+- Optional backup and sync. Sign in with a 6-digit code that is sent to your email. There is no password. Your daily counts and your goal sync between your computers, and they move with you to a new computer or to the Chrome Web Store version.
+- Each computer keeps its own count, and the server adds them together, so two computers never overwrite each other. Your goal follows the most recent change.
+- **Back up & sync** in the top-right corner of the popup shows the sync status. Its panel shows what the server has saved for you (comments, days and computers) and confirms when that matches the popup. From there you can sync now, sign out, change product-update emails, or delete your account and synced data.
+- The extension works the same without an account. No new permissions.
+- The sync server is in `server/` (Vercel Functions, Neon Postgres, Resend).
+
 ## 1.4.0 — 2026-11-11
 
 - A goal celebration. When the comment that reaches your daily goal posts, LinkedIn dims and a card counts up to your goal, confetti made of heatmap squares bursts, and today's square fills in. The card shows your streak, how many goal days you have had, and the time you finished. It stays until you close it (button, Esc, or click outside), once per day.
