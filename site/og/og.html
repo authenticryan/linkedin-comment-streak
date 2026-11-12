@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- Source of public/og.png, the link preview image. Render with `sh og/render.sh`. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1200px; height: 630px; overflow: hidden; background: #fff; color: #1d1d1f; font-family: "Geist", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  .copy { position: absolute; left: 72px; top: 64px; width: 560px; }
+  .brand { display: flex; align-items: center; gap: 12px; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .brand { letter-spacing: -0.03em; }
+  h1 { margin-top: 56px; font-size: 68px; font-weight: 600; line-height: 1.02; letter-spacing: -0.045em; }
+  p { margin-top: 24px; color: #6e6e73; font-size: 26px; line-height: 1.35; }
+  .inbox { position: absolute; left: 676px; top: 110px; width: 460px; padding: 10px; border: 1px solid #e5e5ea; border-radius: 18px; background: #fff; box-shadow: 0 30px 70px -24px rgb(16 24 40 / 0.3); font-size: 17px; }
+  .row { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border-radius: 10px; }
+  .row.sel { background: #e9f1fd; box-shadow: inset 3px 0 0 #0b6bde; }
+  .av { display: grid; place-items: center; flex: none; width: 42px; height: 42px; border-radius: 50%; font-size: 14px; font-weight: 700; }
+  .row b { display: block; font-weight: 600; }
+  .row span.m { color: #6e6e73; font-size: 15px; white-space: nowrap; }
+  .due { margin-left: auto; padding: 3px 9px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .today { background: #fbe9df; color: #b5480f; }
+  .later { background: #f2f2f4; color: #6e6e73; }
+</style>
+</head>
+<body>
+  <div class="copy">
+    <span class="brand"><svg width="44" height="44" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="50" fill="#1D1D1F"></circle><text x="47" y="63" text-anchor="middle" font-family="Geist" font-size="44" font-weight="600" letter-spacing="-2" fill="#FFFFFF">re</text><circle cx="74" cy="31" r="7" fill="#3B82F6"></circle></svg>relink</span>
+    <h1>Never send “Sorry for the late reply” again.</h1>
+    <p>Relink turns your LinkedIn inbox into a follow&#8209;up list.</p>
+  </div>
+  <div class="inbox">
+    <div class="row sel"><span class="av" style="background:#dbeafe;color:#1e4f8a">PR</span><div><b>Priya Raman</b><span class="m">Send two times for a demo</span></div><span class="due today">Late</span></div>
+    <div class="row"><span class="av" style="background:#ffe8d6;color:#7a3e12">DO</span><div><b>Daniel Okafor</b><span class="m">Send the deck and the metrics</span></div><span class="due today">Today</span></div>
+    <div class="row"><span class="av" style="background:#d9f5e7;color:#1d6146">MT</span><div><b>Mei Tanaka</b><span class="m">Book a first call</span></div><span class="due today">Today</span></div>
+    <div class="row"><span class="av" style="background:#eee3fb;color:#5b3a8a">JW</span><div><b>Jonas Weber</b><span class="m">Say yes to the intro</span></div><span class="due later">Thu</span></div>
+    <div class="row"><span class="av" style="background:#fde2ea;color:#8a2f4b">AK</span><div><b>Aisha Khan</b><span class="m">Confirm the pilot start date</span></div><span class="due later">Fri</span></div>
+  </div>
+</body>
+</html>

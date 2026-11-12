@@ -1,0 +1,46 @@
+<!doctype html>
+<!--
+  The Relink mark: a lowercase "re" on a circle, with a blue dot for what's due.
+  Source for every PNG of the logo. Render with `sh brand/render.sh`.
+  ?size=128            the square canvas in px
+  &theme=light|dark    light: ink circle (for light backgrounds); dark: light circle
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@600&display=block">
+<style>
+  html, body { margin: 0; background: transparent; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg id="mark" viewBox="0 0 100 100" aria-hidden="true">
+  <circle cx="50" cy="50" r="50" fill="#1D1D1F"></circle>
+  <text x="47" y="63" text-anchor="middle" font-family="Geist" font-size="44" font-weight="600" letter-spacing="-2" fill="#FFFFFF">re</text>
+  <circle cx="74" cy="31" r="7" fill="#3B82F6"></circle>
+</svg>
+<script>
+  const q = new URLSearchParams(location.search);
+  const size = Number(q.get("size")) || 128;
+  const svg = document.getElementById("mark");
+  svg.setAttribute("width", size);
+  svg.setAttribute("height", size);
+  // Small sizes (favicon, toolbar): bigger letters and dot so they stay readable.
+  if (size <= 32) {
+    const [, text, dot] = svg.children;
+    text.setAttribute("x", "45");
+    text.setAttribute("y", "69");
+    text.setAttribute("font-size", "58");
+    text.setAttribute("letter-spacing", "-1");
+    dot.setAttribute("cx", "79");
+    dot.setAttribute("cy", "25");
+    dot.setAttribute("r", "10");
+  }
+  if (q.get("theme") === "dark") {
+    svg.children[0].setAttribute("fill", "#ECECEF");
+    svg.children[1].setAttribute("fill", "#1D1D1F");
+  }
+</script>
+</body>
+</html>

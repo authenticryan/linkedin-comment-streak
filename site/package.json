@@ -1,0 +1,21 @@
+{
+  "name": "tryrelink-site",
+  "private": true,
+  "type": "module",
+  "description": "tryrelink.live: the Relink landing page and waitlist.",
+  "scripts": {
+    "dev": "node dev.js",
+    "dev:neon": "node --env-file=.env.local dev.js",
+    "test": "node --test test/*.test.mjs",
+    "migrate": "node --env-file-if-exists=.env.local scripts/migrate.js"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16"
+  }
+}
