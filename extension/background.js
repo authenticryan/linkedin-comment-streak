@@ -1,4 +1,4 @@
-import { dayKey, isCommentCreate, celebration, totalCounts, DEFAULT_GOAL } from "./lib.js";
+import { dayKey, isCommentCreate, celebration, goalMark, showCelebration, totalCounts, DEFAULT_GOAL } from "./lib.js";
 import {
   startLogin,
   resendCode,
@@ -64,29 +64,6 @@ async function ring(goalHit) {
   await chrome.runtime.sendMessage({ target: "offscreen", type: "chime", goalHit });
 }
 
-async function chime(todayCount) {
-  const { sound = true, goal = DEFAULT_GOAL } = await chrome.storage.local.get(["sound", "goal"]);
-  if (sound) await ring(todayCount === goal);
-}
-
-// --- Goal celebration ------------------------------------------------------
-
-// Shows the goal-reached overlay (celebrate.js) on the tab where the comment
-// was posted. Once per day and goal, even if the count is fixed down and back.
-async function showCelebration(tabId, todayCount) {
-  if (tabId < 0) return;
-  const { goal = DEFAULT_GOAL, celebrate = true, celebrated } = await chrome.storage.local.get([
-    "goal",
-    "celebrate",
-    "celebrated",
-  ]);
-  const mark = `${dayKey()}/${goal}`;
-  if (!celebrate || todayCount !== goal || celebrated === mark) return;
-  // Fails if the tab was open before the extension was installed or updated.
-  await chrome.tabs.sendMessage(tabId, { type: "celebrate", data: celebration(await totals(), goal) });
-  await chrome.storage.local.set({ celebrated: mark });
-}
-
 // --- Detection -------------------------------------------------------------
 
 let lastCountedAt = 0;
@@ -96,10 +73,23 @@ async function onComment(tabId) {
   lastCountedAt = Date.now();
   console.info("[LCS] comment counted");
   if (!(await adjustToday(1))) return;
+
   // The goal counts comments from all your computers, so use the total.
-  const n = (await totals())[dayKey()] || 0;
-  chime(n).catch((err) => console.warn("[LCS] chime failed", err));
-  showCelebration(tabId, n).catch((err) => console.warn("[LCS] celebration failed", err));
+  const counts = await totals();
+  const { goal = DEFAULT_GOAL, celebrated, sound = true, celebrate = true } = await chrome.storage.local.get([
+    "goal",
+    "celebrated",
+    "sound",
+    "celebrate",
+  ]);
+  // Once per day and goal, even if the count is fixed down and back.
+  const mark = goalMark(counts[dayKey()] || 0, goal, celebrated);
+  if (mark) await chrome.storage.local.set({ celebrated: mark });
+
+  if (sound) ring(Boolean(mark)).catch((err) => console.warn("[LCS] chime failed", err));
+  // The overlay goes on the tab where the comment was posted.
+  if (mark && celebrate && tabId >= 0)
+    showCelebration(tabId, celebration(counts, goal)).catch((err) => console.warn("[LCS] celebration failed", err));
 }
 
 // Watch LinkedIn's own API calls. Only the URL, method and status are read.

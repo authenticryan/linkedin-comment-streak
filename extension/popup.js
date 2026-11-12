@@ -1,4 +1,4 @@
-import { dayKey, addDays, startOfDay, computeStats, celebration, level, totalCounts, DEFAULT_GOAL } from "./lib.js";
+import { dayKey, addDays, startOfDay, computeStats, celebration, showCelebration, level, totalCounts, DEFAULT_GOAL } from "./lib.js";
 import { playChime } from "./chime.js";
 
 const $ = (id) => document.getElementById(id);
@@ -78,15 +78,14 @@ $("testChime").addEventListener("click", async (e) => {
   const data = celebration({ ...counts, [key]: Math.max(counts[key] || 0, goal) }, goal);
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   try {
-    await chrome.tabs.sendMessage(tab.id, { type: "celebrate", data });
+    if (!/^https:\/\/www\.linkedin\.com\//.test(tab?.url || "")) throw new Error("not on LinkedIn");
+    await showCelebration(tab.id, data);
     chrome.runtime.sendMessage({ type: "goalChime" });
     window.close();
   } catch {
-    // No listener: not LinkedIn, or a LinkedIn tab opened before this version.
     playChime(true);
-    const onLinkedIn = /^https:\/\/www\.linkedin\.com\//.test(tab?.url || "");
     const btn = $("testChime");
-    btn.textContent = onLinkedIn ? "Refresh LinkedIn to see it" : "Open LinkedIn to see it";
+    btn.textContent = "Open LinkedIn to see it";
     setTimeout(() => (btn.textContent = "Play"), 2500);
   }
 });

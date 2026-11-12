@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { isCommentCreate, computeStats, celebration, totalCounts, level, dayKey, addDays } from "../extension/lib.js";
+import { isCommentCreate, computeStats, celebration, goalMark, totalCounts, level, dayKey, addDays } from "../extension/lib.js";
 
 const post = (url, statusCode = 200) => isCommentCreate({ method: "POST", statusCode, url });
 
@@ -93,4 +93,14 @@ test("synced totals: this computer plus the others", () => {
   assert.deepEqual(totalCounts(mine), mine, "not signed in");
   assert.deepEqual(totalCounts(undefined, others), others, "new computer");
   assert.deepEqual(mine, { "2026-11-10": 60, "2026-11-11": 30 }, "inputs unchanged");
+});
+
+test("goal moment: once per day and goal, also when sync jumps past the goal", () => {
+  const day = "2026-11-12";
+  assert.equal(goalMark(49, 50, null, day), null, "not yet");
+  assert.equal(goalMark(50, 50, null, day), "2026-11-12/50", "the comment that reaches it");
+  assert.equal(goalMark(51, 50, "2026-11-12/50", day), null, "not again the same day");
+  assert.equal(goalMark(56, 50, null, day), "2026-11-12/50", "synced comments jumped from 48 to 55");
+  assert.equal(goalMark(56, 50, "2026-11-11/50", day), "2026-11-12/50", "yesterday's mark doesn't count");
+  assert.equal(goalMark(60, 55, "2026-11-12/50", day), "2026-11-12/55", "a new goal gets its own moment");
 });

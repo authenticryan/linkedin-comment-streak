@@ -108,6 +108,28 @@ export function computeStats(counts, goal, now = new Date()) {
   return { today: c(today), current, longest, yearTotal, goalDays30 };
 }
 
+// The goal moment (goal chime and celebration) comes once per day and goal:
+// on the comment that takes today's total to the goal, or past it when synced
+// comments from another computer jumped over it. Returns the mark to save in
+// `celebrated`, or null when it isn't the moment.
+export function goalMark(todayCount, goal, celebrated, day = dayKey()) {
+  const mark = `${day}/${goal}`;
+  return todayCount >= goal && celebrated !== mark ? mark : null;
+}
+
+// Shows the celebration (celebrate.js) on a LinkedIn tab. A tab that was open
+// before the extension was installed, updated or reloaded has no listener, so
+// add celebrate.js to it and try again.
+export async function showCelebration(tabId, data) {
+  const msg = { type: "celebrate", data };
+  try {
+    await chrome.tabs.sendMessage(tabId, msg);
+  } catch {
+    await chrome.scripting.executeScript({ target: { tabId }, files: ["celebrate.js"] });
+    await chrome.tabs.sendMessage(tabId, msg);
+  }
+}
+
 // What the goal-reached overlay shows, read right after today hits the goal.
 export function celebration(counts, goal, now = new Date()) {
   const today = startOfDay(now);

@@ -6,7 +6,10 @@
 - Each computer keeps its own count, and the server adds them together, so two computers never overwrite each other. Your goal follows the most recent change.
 - Backups run at most once an hour while you comment, and when Chrome starts. **Sync now** backs up at once. Your counts on this computer always update immediately.
 - **Back up & sync** in the top-right corner of the popup shows the sync status. Its panel shows what the server has saved for you (comments, days and computers) and confirms when that matches the popup. From there you can sync now, sign out, change product-update emails, or delete your account and synced data.
-- The extension works the same without an account. No new permissions.
+- The extension works the same without an account.
+- The goal celebration now shows on a LinkedIn tab that was open before the extension was installed, updated or reloaded. Before, it failed silently until you refreshed LinkedIn. Shift-click **Play** works on those tabs too.
+- The goal moment also comes when synced comments from another computer take today's total past your goal: on your next comment, once per day.
+- One new permission, `scripting`, to add the celebration to those tabs. Chrome shows no new warning for it.
 - The sync server is in `server/` (Vercel Functions, Neon Postgres, Resend).
 
 ## 1.4.0 — 2026-11-11

@@ -69,6 +69,7 @@ Updates later: bump the version, upload the new zip, submit. Users get it automa
 | `webRequest` | Detects when LinkedIn's "create comment" request completes successfully, using only its URL and status, so the comment can be counted. Request and response bodies are never read. |
 | `alarms` | Refreshes the toolbar badge periodically so today's count resets after midnight. |
 | `offscreen` | Plays a short chime when a comment is counted (extension service workers cannot play audio). |
+| `scripting` | Shows the goal celebration on a LinkedIn tab that was open before the extension was installed or updated (Chrome doesn't add content scripts to tabs that are already open). It adds only the extension's own `celebrate.js` file, only on linkedin.com. |
 | Host `https://www.linkedin.com/*` | Needed to observe LinkedIn's comment requests and to add the ⌘+Enter shortcut to LinkedIn's comment box. No other sites are accessed. |
 
 **Remote code:** No, all code is in the package.
