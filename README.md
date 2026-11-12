@@ -8,7 +8,7 @@ Comment Streak is a Chrome extension. It counts the comments that you post on Li
 
 ![Comment Streak popup: 80 of 100 comments today, a current streak of 23 days, the goal on 25 of the last 30 days, and 14,049 comments on a green heatmap for one year](store/screenshot-1-1280x800.png)
 
-**Chrome Web Store:** in review · **Download:** [latest release](https://github.com/authenticryan/linkedin-comment-streak/releases/latest) · **Privacy:** [no data goes out of your browser unless you turn on sync](PRIVACY.md)
+**Chrome Web Store:** [install](https://chromewebstore.google.com/detail/comment-streak-for-linked/gmflljeahipnkaahfcplloegahoefkbg) · **Download:** [latest release](https://github.com/authenticryan/linkedin-comment-streak/releases/latest) · **Privacy:** [no data goes out of your browser unless you turn on sync](PRIVACY.md)
 
 ---
 
@@ -38,10 +38,10 @@ I made the same type of graph for LinkedIn comments. At 100 comments each day, y
 - **A celebration at the goal.** When you post the comment that completes your goal, the LinkedIn page goes dark. A card counts up to your goal. Then confetti in the heatmap colors bursts, and the square for today changes to green. The card shows your streak, your number of goal days, and the time that you completed the goal. The card stays until you close it. To see the full goal moment, open LinkedIn, hold Shift, and click **Play** in the popup. You can also set the celebration to off.
 - **⌘+Enter to post.** Press ⌘+Enter (Ctrl+Enter on Windows) to post the comment in the comment box.
 - **Manual correction.** If the count for today is not correct, use **−** and **+** to correct it.
-- **Backup and sync (optional).** Click **Back up & sync** in the popup and type your email. The extension sends a 6-digit code to your email. Type the code in the popup. Your counts and your goal then sync between your computers. If you use a new computer, sign in, and your heatmap comes back. The extension works the same without an account.
+- **Backup and sync (optional).** Click **Back up & sync** in the popup and type your email. The extension sends a 6-digit code to your email. Type the code in the popup. Your counts and your goal then sync between your computers. If you use a new computer, sign in, and your heatmap comes back. While you comment, the extension sends your counts a maximum of one time each hour. To send them immediately, click **Sync now**. The panel shows the number of comments that the server saved, and it shows if this number is the same as the popup. The extension works the same without an account.
 - **Privacy.** The extension has no analytics. It does not read the text of your comments. Without sync, no data goes out of your browser. With sync, the server stores only your email, your counts for each day, and your goal.
 
-![Dark theme: a sound for each comment, the badge shows the count for today, and ⌘+Enter posts the comment](store/screenshot-2-1280x800.png)
+![The goal celebration: a dark card shows 100 comments today, the text "You showed up 100 times today.", a 24-day streak, and the 131st goal day](store/screenshot-2-1280x800.png)
 
 ## Product decisions
 
@@ -76,10 +76,10 @@ In a small product, the most important decisions are about what to remove. This 
 - **Sound from a service worker.** In Manifest V3, a service worker cannot play audio. For this reason, the sound plays in an offscreen document. The Web Audio API makes the sound from sine tones and one overtone, so the extension has no sound files.
 - **Tests with real data.** The tests use request names from linkedin.com. These names include the similar requests that the extension must not count. The tests also examine the streak and color rules. The tests use the built-in test runner of Node.
 - **Fast repairs.** The service worker records each LinkedIn `POST` request in the console. If LinkedIn changes its endpoint, the new request name shows in the console after one test comment. [MAINTAINING.md](MAINTAINING.md) gives the repair procedure.
-- **Store images from the real interface.** A script opens the real popup in headless Chrome with sample data for one year. Thus, the screenshots show the real product, not a mockup.
+- **Store images from the real interface.** A script opens the real popup and the real goal celebration in headless Chrome with sample data for one year. Thus, the screenshots show the real product, not a mockup. The Chrome Web Store shows each screenshot at approximately half size. For this reason, the product fills most of each screenshot, and the text is large.
 - **Sync server with one dependency.** The optional sync server is in `server/`. It runs on Vercel Functions, stores data in Neon Postgres, and sends sign-in codes with Resend. It uses no framework and no authentication library. Its only runtime dependency is the Neon database driver. The server keeps codes and session tokens only as hashes. Each code operates one time, for 10 minutes, for a maximum of 5 attempts. The server sends a maximum of 5 codes for each email in one hour.
 - **Server tests with real Postgres.** The server tests run all of the SQL against PGlite. PGlite is Postgres compiled to WebAssembly, so the tests need no database server. The tests examine sign-in, rate limits, the sync between two computers, the goal, consent, and the deletion of an account.
-- **Sync that repairs itself.** Each sync sends all of the counts of the computer (a few KB), not only the changes. If one sync fails, the next sync makes the server correct again. A sync occurs a maximum of one time each 30 seconds. Thus, the database sleeps for most of the day and stays in the free plan.
+- **Sync that repairs itself.** Each sync sends all of the counts of the computer (a few KB), not only the changes. If one sync fails, the next sync makes the server correct again. While you comment, a sync occurs a maximum of one time each hour. The count on your computer changes immediately. Only the copy on the server waits. This decreases the server requests by approximately 15 times, so that the free plans can support more users.
 - **Light and dark themes.** The extension uses the theme of your system and the colors of the GitHub contribution graph.
 - **Release pipeline.** For each push, GitHub Actions examines the manifest and runs the tests. When you push a `v*` tag, GitHub Actions makes the store zip file and publishes a GitHub release. The release notes come from the changelog. If the tag and the manifest version are different, the release stops.
 

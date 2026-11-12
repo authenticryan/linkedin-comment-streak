@@ -129,9 +129,14 @@ export function syncNow() {
   return running;
 }
 
-// At most one sync per 30 seconds while you comment. Each sync wakes the
-// database, so this keeps it asleep most of the day (and inside free limits).
+// Backs up at most once an hour while you comment. Comments count on this
+// computer straight away; only the copy on the server waits. One sync an hour
+// instead of one per comment cuts server requests about 15 times, which is
+// what keeps thousands of daily users inside free plans.
+export const SYNC_EVERY_MIN = 60;
 export async function syncSoon() {
-  const { auth } = await local.get("auth");
-  if (auth?.token && !(await chrome.alarms.get("sync"))) chrome.alarms.create("sync", { delayInMinutes: 0.5 });
+  const { auth, sync } = await local.get(["auth", "sync"]);
+  if (!auth?.token || (await chrome.alarms.get("sync"))) return; // already scheduled: this change rides along
+  const due = (sync?.at || 0) + SYNC_EVERY_MIN * 60_000;
+  chrome.alarms.create("sync", { delayInMinutes: Math.max(0.5, (due - Date.now()) / 60_000) });
 }

@@ -3,49 +3,108 @@
 <head>
 <meta charset="utf-8" />
 <title>Store screenshot</title>
+<!--
+  Chrome Web Store screenshots, 1280x800. The store shows them at about 590x370,
+  so the product fills most of the frame and the text is big.
+    ?v=1  heatmap (light)     ?v=2  goal celebration
+    ?v=3  backup and sync     ?v=4  heatmap (dark, run with --force-dark-mode)
+  ?v=2 needs --force-dark-mode --force-prefers-reduced-motion (the final frame, no animation).
+-->
 <style>
-  :root { --bg1: #f5f8fb; --bg2: #e3edf8; --fg: #1f2328; --muted: #57606a; --dot: #30a14e; --frame: #d0d7de; }
+  :root { --bg1: #f5f8fb; --bg2: #e3edf8; --fg: #1f2328; --muted: #57606a; --dot: #1a7f37; --frame: #d0d7de; }
   @media (prefers-color-scheme: dark) {
-    :root { --bg1: #0b0f14; --bg2: #13233a; --fg: #e6edf3; --muted: #9da7b3; --dot: #39d353; --frame: #30363d; }
+    :root { --bg1: #0b0f14; --bg2: #10261a; --fg: #e6edf3; --muted: #9da7b3; --dot: #39d353; --frame: #30363d; }
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; }
   body {
-    display: flex; align-items: center; gap: 48px; padding: 0 64px 0 80px;
+    position: relative;
     background: linear-gradient(135deg, var(--bg1), var(--bg2));
     color: var(--fg); font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  .copy { width: 400px; flex: none; }
-  .eyebrow { font-size: 16px; font-weight: 600; color: var(--dot); letter-spacing: .02em; margin-bottom: 18px; }
-  h1 { font-size: 46px; line-height: 1.08; margin: 0 0 28px; letter-spacing: -0.02em; }
-  ul { list-style: none; padding: 0; margin: 0; font-size: 19px; color: var(--muted); }
-  li { margin: 12px 0; padding-left: 26px; position: relative; }
-  li::before { content: ""; position: absolute; left: 0; top: 7px; width: 12px; height: 12px; border-radius: 3px; background: var(--dot); }
-  .popup {
-    width: 672px; height: 318px; flex: none; overflow: hidden;
-    border-radius: 12px; border: 1px solid var(--frame);
-    box-shadow: 0 24px 60px rgb(0 0 0 / 18%), 0 4px 14px rgb(0 0 0 / 8%);
+  .eyebrow { font-size: 20px; font-weight: 650; color: var(--dot); margin-bottom: 14px; }
+  h1 { font-size: 60px; line-height: 1.04; margin: 0; letter-spacing: -0.025em; font-weight: 750; }
+  .sub { font-size: 27px; line-height: 1.3; color: var(--muted); margin: 18px 0 0; }
+
+  /* A window onto a real page: a viewport of vw x vh, cropped to the region
+     (x, y, w, h) and shown at scale s. */
+  .shot {
+    position: absolute; overflow: hidden; border-radius: 16px; border: 1px solid var(--frame);
+    box-shadow: 0 30px 70px rgb(0 0 0 / 22%), 0 6px 16px rgb(0 0 0 / 10%);
   }
-  iframe { width: 790px; height: 425px; border: 0; transform: scale(0.85); transform-origin: 0 0; display: block; }
+  .shot iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; }
+  .shot.bleed { border: 0; border-radius: 0; box-shadow: none; }
+  .copy { z-index: 1; }
+  .confetti { position: absolute; inset: 0; z-index: 2; }
+
+  /* Stacked: headline on top, the whole popup below. */
+  .stack .copy { position: absolute; left: 0; right: 0; top: 52px; text-align: center; }
+  .stack .eyebrow { margin-bottom: 10px; }
+  .stack h1 { font-size: 54px; }
+  .stack .sub { margin-top: 10px; font-size: 25px; }
+
+  /* Split: copy on the left, a close-up on the right. */
+  .split .copy { position: absolute; left: 72px; top: 0; bottom: 0; width: 400px; display: flex; flex-direction: column; justify-content: center; }
+
+  .confetti i { position: absolute; width: 18px; height: 18px; border-radius: 4px; }
 </style>
 </head>
 <body>
   <div class="copy">
     <div class="eyebrow">Comment Streak for LinkedIn</div>
-    <h1 id="headline">See how consistent you really are.</h1>
-    <ul id="points">
-      <li>Counts every comment, even at 100+ a day</li>
-      <li>Heatmap shaded by your daily goal</li>
-      <li>Current and longest streaks</li>
-      <li>Private by default. Sync is optional.</li>
-    </ul>
+    <h1 id="h1"></h1>
+    <p class="sub" id="sub"></p>
   </div>
-  <div class="popup"><iframe src="popup-demo.html" title="Extension popup"></iframe></div>
   <script>
-    if (new URLSearchParams(location.search).get("v") === "2") {
-      document.getElementById("headline").textContent = "A ding for every comment. Keep the streak alive.";
-      document.getElementById("points").innerHTML =
-        "<li>Soft chime per comment, bigger one at your goal</li><li>Badge shows today's count at a glance</li><li>⌘+Enter posts the comment you're typing</li><li>Optional sync. No tracking.</li>";
+    const v = new URLSearchParams(location.search).get("v") || "1";
+    const VARIANTS = {
+      1: { layout: "stack", h1: "See how consistent you really are.", sub: "Every comment you post on LinkedIn, counted and mapped.",
+           frame: { src: "popup-demo.html", vw: 790, vh: 430, x: 0, y: 0, w: 790, h: 382, s: 1.45, left: 67, top: 228 } },
+      // The whole frame is the scene, as on LinkedIn; the card sits right of centre.
+      2: { layout: "split", h1: "Hit your goal. Let it land.", sub: "A full-page moment when you reach your daily goal, with your streak and your week.",
+           frame: { src: "celebrate-demo.html", vw: 1408, vh: 640, x: 0, y: 0, w: 1408, h: 640, s: 1.25, left: 0, top: 0, bleed: true }, confetti: true },
+      3: { layout: "split", h1: "Your streak, backed up.", sub: "Sign in with a code from your email. No password. Your history follows you to every computer.",
+           frame: { src: "popup-demo.html?state=sync", vw: 790, vh: 430, x: 180, y: 30, w: 430, h: 370, s: 1.75, left: 480, top: 76, click: "account" } },
+      4: { layout: "stack", h1: "A chime for every comment.", sub: "Today's count on the toolbar. Your streak one click away.",
+           frame: { src: "popup-demo.html", vw: 790, vh: 430, x: 0, y: 0, w: 790, h: 382, s: 1.45, left: 67, top: 228 } },
+    };
+    const c = VARIANTS[v];
+    document.body.className = c.layout;
+    document.getElementById("h1").textContent = c.h1;
+    document.getElementById("sub").textContent = c.sub;
+
+    const f = c.frame;
+    const shot = document.createElement("div");
+    shot.className = f.bleed ? "shot bleed" : "shot";
+    Object.assign(shot.style, { left: `${f.left}px`, top: `${f.top}px`, width: `${f.w * f.s}px`, height: `${f.h * f.s}px` });
+    const frame = document.createElement("iframe");
+    frame.src = f.src;
+    frame.title = "Extension";
+    Object.assign(frame.style, { width: `${f.vw}px`, height: `${f.vh}px`, transform: `scale(${f.s}) translate(${-f.x}px, ${-f.y}px)` });
+    if (f.click) frame.addEventListener("load", () => setTimeout(() => {
+      const doc = frame.contentDocument;
+      doc.getElementById(f.click).click();
+      setTimeout(() => doc.activeElement?.blur(), 50); // no focus ring in the picture
+    }, 300));
+    shot.append(frame);
+    document.body.append(shot);
+
+    // Static confetti in the heatmap greens (the real one moves).
+    if (c.confetti) {
+      const box = document.createElement("div");
+      box.className = "confetti";
+      const greens = ["#0e4429", "#006d32", "#26a641", "#39d353", "#9be9a8"];
+      const rand = (s) => { const x = Math.sin(s * 91.17) * 43758.5453; return x - Math.floor(x); };
+      for (let i = 0; i < 46; i++) {
+        const left = 500 + rand(i + 1) * 780, top = rand(i + 50) * 790;
+        if (left > 590 && left < 1170 && top > 50 && top < 750) continue; // keep the card clear
+        const sq = document.createElement("i");
+        const size = 9 + rand(i + 99) * 14;
+        Object.assign(sq.style, { left: `${left}px`, top: `${top}px`, width: `${size}px`, height: `${size}px`,
+          background: greens[Math.floor(rand(i + 7) * greens.length)], transform: `rotate(${rand(i + 3) * 90}deg)`, opacity: 0.55 + rand(i + 21) * 0.45 });
+        box.append(sq);
+      }
+      document.body.append(box);
     }
   </script>
 </body>

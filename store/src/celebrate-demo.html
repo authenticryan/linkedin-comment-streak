@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Celebration demo</title>
+<!--
+  The real goal celebration (extension/celebrate.js) over a generic feed, for the
+  store screenshot. Render with --force-prefers-reduced-motion to get the final frame.
+-->
+<style>
+  /* A generic dark feed: the overlay dims and blurs it into a soft backdrop. */
+  body { margin: 0; padding: 24px; font-family: system-ui, sans-serif;
+         background: radial-gradient(40% 60% at 62% 45%, #12361f, transparent 70%), #161b22; }
+  .post { background: #222a33; border-radius: 10px; padding: 16px; margin: 0 auto 14px; max-width: 760px; }
+  .post b, .post i { display: block; border-radius: 6px; background: #343e4a; }
+  .post b { width: 40%; height: 14px; margin-bottom: 14px; }
+  .post i { height: 10px; margin: 8px 0; }
+  .post .img { height: 140px; margin-top: 14px; border-radius: 8px; background: #2b3540; }
+</style>
+<script>
+  // A fixed clock, so the card says "Done at 6:12 PM" whenever this is rendered.
+  const FIXED = new Date(2026, 10, 12, 18, 12).getTime();
+  const RealDate = Date;
+  window.Date = class extends RealDate {
+    constructor(...a) { super(...(a.length ? a : [FIXED])); }
+    static now() { return FIXED; }
+  };
+  let listener;
+  window.chrome = { runtime: { onMessage: { addListener: (fn) => (listener = fn) } } };
+</script>
+</head>
+<body>
+  <div class="post"><b></b><i></i><i></i><i style="width:70%"></i><div class="img"></div></div>
+  <div class="post"><b></b><i></i><i style="width:80%"></i><div class="img"></div></div>
+  <div class="post"><b></b><i></i><i></i></div>
+  <script src="/extension/celebrate.js"></script>
+  <script>
+    const today = new Date();
+    const week = [3, 4, 3, 3, 4, 3, 4].map((level, i) => ({ day: (today.getDay() + i + 1) % 7, level }));
+    listener({ type: "celebrate", data: { goal: 100, streak: 24, record: true, goalDays: 131, prevLevel: 2, week } }, {}, () => {});
+  </script>
+</body>
+</html>

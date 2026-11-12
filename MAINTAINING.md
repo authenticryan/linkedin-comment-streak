@@ -42,7 +42,7 @@ The comment box changed. On linkedin.com, open DevTools and inspect the comment 
 
 ## Sync server
 
-The extension works without it. When signed in, the extension sends all of this computer's counts at most once every 30 seconds, plus when the popup opens and when Chrome starts. The server stores one row per day per computer and answers with the totals from your other computers.
+The extension works without it. When signed in, the extension sends all of this computer's counts at most once an hour while you comment, when you open the popup and the last sync is over an hour old, when Chrome starts, and when you click **Sync now**. Comments count locally at once; only the server copy waits. The server stores one row per day per computer and answers with the totals from your other computers.
 
 ### Where it runs
 

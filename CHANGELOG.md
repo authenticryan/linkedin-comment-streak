@@ -4,6 +4,7 @@
 
 - Optional backup and sync. Sign in with a 6-digit code that is sent to your email. There is no password. Your daily counts and your goal sync between your computers, and they move with you to a new computer or to the Chrome Web Store version.
 - Each computer keeps its own count, and the server adds them together, so two computers never overwrite each other. Your goal follows the most recent change.
+- Backups run at most once an hour while you comment, and when Chrome starts. **Sync now** backs up at once. Your counts on this computer always update immediately.
 - **Back up & sync** in the top-right corner of the popup shows the sync status. Its panel shows what the server has saved for you (comments, days and computers) and confirms when that matches the popup. From there you can sync now, sign out, change product-update emails, or delete your account and synced data.
 - The extension works the same without an account. No new permissions.
 - The sync server is in `server/` (Vercel Functions, Neon Postgres, Resend).

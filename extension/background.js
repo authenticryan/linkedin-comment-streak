@@ -9,6 +9,7 @@ import {
   deleteAccount,
   syncNow,
   syncSoon,
+  SYNC_EVERY_MIN,
 } from "./sync.js";
 
 // Serialise writes so two quick comments can't overwrite each other.
@@ -144,10 +145,11 @@ const ACCOUNT_ACTIONS = {
   "account:delete": () => deleteAccount(),
   "sync:now": () => syncNow(),
   "sync:soon": () => syncSoon(),
-  // The popup opened: get the other computers' latest, unless we just did.
+  // The popup opened: get the other computers' latest, unless the last sync
+  // is less than an hour old (newer comments go with the hourly backup).
   "sync:pull": async () => {
     const { sync } = await chrome.storage.local.get("sync");
-    if (!sync?.at || Date.now() - sync.at > 60_000) await syncNow();
+    if (!sync?.at || Date.now() - sync.at > SYNC_EVERY_MIN * 60_000) await syncNow();
   },
 };
 

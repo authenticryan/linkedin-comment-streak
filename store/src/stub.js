@@ -20,13 +20,22 @@
   }
   counts[key(now)] = 80;
 
+  // ?state=sync: signed in to Back up & sync, with the server's totals matching.
+  const data = { counts, goal: 100, sound: true };
+  if (new URLSearchParams(location.search).get("state") === "sync") {
+    const days = Object.values(counts).filter((n) => n > 0);
+    data.auth = { token: "demo", email: "alex@example.com", marketing: false };
+    data.sync = { at: Date.now() - 3 * 60_000, saved: { comments: days.reduce((a, b) => a + b, 0), days: days.length, computers: 2 } };
+  }
+
   window.chrome = {
     storage: {
-      local: { get: async () => ({ counts, goal: 100, sound: true }), set: async () => {} },
+      local: { get: async () => data, set: async () => {} },
       session: { get: async () => ({}) },
       onChanged: { addListener() {} },
     },
     runtime: { sendMessage: async () => ({ ok: true }) },
+    alarms: { get: async () => null },
   };
 
   const style = document.createElement("style");

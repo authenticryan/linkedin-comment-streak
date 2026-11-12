@@ -20,7 +20,7 @@ LinkedIn's trademark rules and the Store's impersonation policy make "LinkedIn" 
 
 ### 3. Your existing history
 
-A Store install is a different extension from your unpacked copy, so **it starts with an empty heatmap.** Build export/import first (MAINTAINING.md backlog #1) if you want to keep your history.
+A Store install is a different extension from your unpacked copy, so **it starts with an empty heatmap.** To keep your history, sign in to **Back up & sync** in both copies, then remove the unpacked copy. (If both copies count at the same time, each comment counts two times.)
 
 ## Steps
 
@@ -30,7 +30,7 @@ A Store install is a different extension from your unpacked copy, so **it starts
 4. **Store listing tab**
    - Description (draft below), category **Productivity**, language English
    - Icon: 128×128 (taken from the zip)
-   - At least 1 screenshot, **1280×800** (up to 5)
+   - Screenshots, **1280×800**: upload `store/screenshot-1` to `-4` in order (heatmap, celebration, sync, dark)
    - Small promo tile, **440×280**
 5. **Privacy practices tab:** paste the answers below.
 6. **Distribution:** pick visibility, then **Submit for review.**
@@ -48,9 +48,11 @@ Updates later: bump the version, upload the new zip, submit. Users get it automa
 > • Toolbar badge with today's count, green when you hit your goal
 > • Heatmap shaded by your daily goal, plus current and longest streaks
 > • A soft chime for every comment and a brighter one when you hit your goal
+> • A full-page celebration on the comment that completes your goal
+> • Optional backup and sync: sign in with a code from your email, no password, and your history follows you to every computer
 > • ⌘+Enter / Ctrl+Enter to post the comment you're typing
 >
-> Private by design: no account, no server, no tracking. It never reads your comment text. Counts are stored only in your browser.
+> Private by default: without an account, nothing leaves your browser. With backup and sync, only your email, your daily counts and your goal are stored. It never reads your comment text. No ads, no tracking.
 >
 > Not affiliated with or endorsed by LinkedIn.
 
@@ -71,7 +73,11 @@ Updates later: bump the version, upload the new zip, submit. Users get it automa
 
 **Remote code:** No, all code is in the package.
 
-**Data usage:** tick no data types, since nothing leaves the browser. Certify all three statements (no selling, no unrelated use, no creditworthiness use).
+**Data usage (from v1.5.0):** tick these two, because they leave the browser when the user turns on backup and sync:
+- **Personally identifiable information:** the email address, to sign in with a one-time code and, only if the user ticks the box, for product-update emails.
+- **User activity:** the number of comments the user posts each day, to back up and sync the heatmap between their computers.
+
+Certify all three statements (no selling, no unrelated use, no creditworthiness use). The extension calls `https://comment-streak-sync.vercel.app` only to sign in and to sync. It needs no extra permission for that.
 
 **Privacy policy URL:**
 `https://github.com/authenticryan/linkedin-comment-streak/blob/main/PRIVACY.md`

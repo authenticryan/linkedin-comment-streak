@@ -5,6 +5,7 @@ const $ = (id) => document.getElementById(id);
 const WEEKS = 53;
 const fmt = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 const monthFmt = new Intl.DateTimeFormat(undefined, { month: "short" });
+const timeFmt = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
 const days = (n) => `${n} ${n === 1 ? "day" : "days"}`;
 
 async function render() {
@@ -140,8 +141,12 @@ async function renderAccount(auth, sync = {}, counts = {}) {
       const n = (x, word) => `${x.toLocaleString()} ${word}${x === 1 ? "" : "s"}`;
       $("savedValue").textContent = `${n(saved.comments, "comment")} over ${n(saved.days, "day")}`;
       $("savedMeta").textContent = `From ${n(saved.computers, "computer")} · synced ${ago(sync.at)}.`;
+      // Comments since the last sync go with the hourly backup; say when.
       const here = Object.values(counts).reduce((a, b) => a + b, 0);
+      const next = saved.comments === here ? null : await chrome.alarms.get("sync");
       $("savedMatch").hidden = saved.comments !== here;
+      $("savedNext").hidden = !next;
+      if (next) $("savedNext").textContent = `Your newest comments back up at ${timeFmt.format(next.scheduledTime)}.`;
     }
   } else if (pendingLogin) {
     $("codeEmail").textContent = pendingLogin.email;
